@@ -17,9 +17,33 @@ Our key differentiator is our focus on **curated community and flexible access**
 
 ### **2. The Platform Ecosystem: User Groups**
 
-Our marketplace is built around a clear set of user roles, each with distinct goals and motivations.
+Our marketplace is built around a clear set of user roles, each with distinct goals and motivations. **We now serve four primary target groups through dedicated experiences:**
 
-#### **Host Roles (The "Supply" Side)**
+#### **Target Group 1: Individual Professionals (Members)**
+*Served through: `/members` page and member dashboard*
+
+*   **The Freelancer/Consultant**
+    *   **Who they are:** Independent professionals across various fields (design, development, consulting, writing)
+    *   **Their Problem:** Working from home is isolating, cafes are unreliable, and traditional co-working is expensive with long commitments
+    *   **Our Solution:** Flexible workspace access from 1 hour to 12 months, professional networking, no long-term commitments
+
+*   **The Remote Worker**  
+    *   **Who they are:** Employees of companies with distributed teams who need occasional professional workspace
+    *   **Their Problem:** Need professional environment for important calls, meetings, and focused work periods
+    *   **Our Solution:** On-demand access to premium workspaces when working from home isn't sufficient
+
+*   **The Digital Nomad**
+    *   **Who they are:** Location-independent professionals who travel while working
+    *   **Their Problem:** Unreliable internet and workspace quality while traveling
+    *   **Our Solution:** Vetted, professional spaces with guaranteed quality in every destination
+
+*   **The Startup Founder**
+    *   **Who they are:** Early-stage entrepreneurs building their companies
+    *   **Their Problem:** Can't commit to expensive co-working spaces before knowing team size needs
+    *   **Our Solution:** Scale workspace access as the startup grows, networking with other entrepreneurs
+
+#### **Target Group 2: Workspace Hosts**
+*Served through: `/hosts` page with dual focus*
 
 *   **The Corporate Host**
     *   **Who they are:** A business (e.g., a tech company, a law firm) with extra desks in their active, operational office. They are on-site and part of the community.
@@ -31,16 +55,21 @@ Our marketplace is built around a clear set of user roles, each with distinct go
     *   **Their Problem:** Maximizing occupancy, managing logistics, and marketing a property is complex. Empty spaces are pure financial losses.
     *   **Our Solution:** We provide powerful marketplace tools to manage pricing, availability, and bookings efficiently. Our **Hub Ambassador Program** solves the community management challenge, making their property more attractive. Their listings are badged as **"Pro Workspaces."**
 
-#### **Member Roles (The "Demand" Side)**
+#### **Target Group 3: Enterprise Companies** ⭐ **NEW FLAGSHIP OFFERING**
+*Served through: `/enterprise` page and corporate dashboard*
 
-*   **The Community Member**
-    *   **Who they are:** The core user of the space. This includes startup founders, freelancers, remote employees, and visiting professionals.
-    *   **Their Problem:** They need professional workspace with flexible terms (from a day to a year). They are often professionally isolated and crave meaningful connections that traditional co-working spaces fail to provide.
-    *   **Our Solution:** We offer a trusted marketplace to find beautiful workspaces for any duration. Our **Discovery & Matching Engine** helps them connect with valuable collaborators within their chosen space.
+*   **The Corporate Benefits Buyer**
+    *   **Who they are:** HR leaders, People Operations, and C-suite executives at companies of all sizes (5 to 5000+ employees)
+    *   **Their Problem:** Distributed teams need workspace flexibility, but managing individual bookings, expense reports, and procurement is administratively complex and expensive
+    *   **Our Solution:** **WorkFlex Benefits Program** - workspace access as an employee benefit with three tiers:
+        - **StartupFlex** ($20/employee/month): 25 credits, basic features for 5-50 employees  
+        - **ScaleFlex** ($35/employee/month): 50 credits, priority booking, account management for 50-500 employees
+        - **EnterpriseFlex** (Custom pricing): Unlimited access, SSO, white-label options for 500+ employees
 
-*   **The Hub Ambassador**
-    *   **Who they are:** A trusted, long-term Community Member in a "Pro Workspace."
-    *   **Their Role:** In exchange for benefits (e.g., a free desk), they act as the on-site community leader, welcoming new members and fostering a vibrant atmosphere. They are the human face of the Pro Workspace.
+*   **The Corporate Employee**
+    *   **Who they are:** Employees of companies that offer WorkFlex benefits
+    *   **Their Problem:** Need professional workspace while traveling, working remotely, or during office renovations
+    *   **Our Solution:** Seamless booking using company credits - no personal payment, no expense reports, instant approval
 
 #### **Platform Role**
 
@@ -52,38 +81,55 @@ Our marketplace is built around a clear set of user roles, each with distinct go
 
 ### **3. Detailed Feature Breakdown**
 
-This section details every component and screen of the prototype.
+This section details every component and screen of the prototype, **now organized around our four target group experiences.**
 
 #### **Part 1: The Global Platform Experience**
 
-*   **[G-1] Homepage:** The main entry point. Clean, spacious, and photo-first. Features a hero section with a central search bar ("Location," "Duration") and visually-driven sections below showcasing different types of spaces.
+*   **[G-1] Homepage:** The main entry point with target group navigation. Features a hero section with central search, and dedicated sections showcasing different user paths (Members, Hosts, Enterprise).
 *   **[G-2] Search Results Page:** A split-screen view with an interactive map on the right and a filterable list of `SpaceCard` components on the left. Filters include Booking Type, Host Type, Price, and Amenities.
 *   **[G-3] Space Listing Page:** The "product page" for a space.
     *   **Visuals:** A beautiful, Airbnb-style photo gallery is the hero element.
     *   **Information Hierarchy:** Clearly displays the space title, location, and host information. Differentiates between a **"Corporate Hub"** (showing the host company's brand) and a **"Pro Workspace"** (showing the provider's brand alongside the on-site **Hub Ambassador's** profile).
-    *   **Booking Widget:** A sticky component allowing users to select a booking type (Day Pass, Monthly Desk, etc.), see the price, and simulate a booking.
+    *   **Booking Widget:** A sticky component allowing users to select a booking type (Day Pass, Monthly Desk, etc.), see the price, and simulate a booking. **For corporate employees, shows company credit integration.**
     *   **Details:** Includes tabs for a full description, amenities, and (dummy) reviews.
-*   **[G-4] Onboarding Flow:** A simulated, modal-based system for login and signup. The signup flow intelligently directs users down the correct path (Member, Corporate Host, or Pro Provider).
+*   **[G-4] Onboarding Flow:** A simulated, modal-based system for login and signup. The signup flow intelligently directs users down the correct path (Member, Corporate Host, Pro Provider, or Corporate Employee).
 
-#### **Part 2: The Community Member Journey**
+#### **Part 2: Individual Professional Experience (`/members`)**
 
-*   **[M-1] Personalized Dashboard:** The member's welcome screen. It leads with the **"Discover Connections"** module and includes a clear widget showing their current booking status and on-site contact (either the Host or the Hub Ambassador).
-*   **[M-2] Discovery & Matching Engine:** The core member feature. A visually engaging grid or carousel of `MatchCard` components. Each card displays another member's profile and, crucially, a hardcoded **"Match Reason"** that explains the suggested connection (e.g., "Complementary skills").
-*   **[M-3] Connection & Chat Simulation:** A seamless flow from clicking "Connect" on a Match Card to opening a high-fidelity, simulated chat interface. The chat history is pre-scripted to demonstrate a story of successful collaboration.
-*   **[M-4] Account Management:** Includes sections for viewing booking history, (simulating) profile edits, and accessing the Referral Program page with a unique code and tracker for earned rewards.
+*   **[M-1] Members Landing Page:** Dedicated page showcasing different professional types (freelancers, remote workers, startup founders, digital nomads) with tailored messaging for each.
+*   **[M-2] Personalized Dashboard:** The member's welcome screen. It leads with the **"Discover Connections"** module and includes a clear widget showing their current booking status and on-site contact (either the Host or the Hub Ambassador).
+*   **[M-3] Discovery & Matching Engine:** The core member feature. A visually engaging grid or carousel of `MatchCard` components. Each card displays another member's profile and, crucially, a hardcoded **"Match Reason"** that explains the suggested connection (e.g., "Complementary skills").
+*   **[M-4] Connection & Chat Simulation:** A seamless flow from clicking "Connect" on a Match Card to opening a high-fidelity, simulated chat interface. The chat history is pre-scripted to demonstrate a story of successful collaboration.
+*   **[M-5] Account Management:** Includes sections for viewing booking history, (simulating) profile edits, and accessing the Referral Program page with a unique code and tracker for earned rewards.
 
-#### **Part 3: The Host Journey (Corporate & Professional)**
+#### **Part 3: Host Experience (`/hosts`)**
 
-*   **[H-1] The Tailored Host Dashboard:** The dashboard's UI and widgets adapt to the host's role.
+*   **[H-1] Hosts Landing Page:** Dynamic page that adapts based on host type selection (Corporate Host vs Professional Provider) with tailored benefits, success stories, and onboarding flows.
+*   **[H-2] The Tailored Host Dashboard:** The dashboard's UI and widgets adapt to the host's role.
     *   **Corporate Host View:** Focuses on community health and synergy. Features the **"A.I. Recruiting Agent"** to find talent that can collaborate with their own team.
     *   **Professional Provider View:** Focuses on business metrics like Occupancy and Revenue. Features the **"A.I. Anchor Tenant Finder"** to attract stable, long-term members.
-*   **[H-2] The Listings & Pricing Manager:** A unified, intuitive tool for *all* hosts. This is where they manage their space's photos, descriptions, and, most importantly, define their **"Booking Products"**—setting the price and quantity for Day Passes, Monthly Desks, etc.
-*   **[H-3] The Host Inbox & Earnings:** A unified inbox for all member communications and a clean dashboard showing a breakdown of (dummy) earnings.
+*   **[H-3] The Listings & Pricing Manager:** A unified, intuitive tool for *all* hosts. This is where they manage their space's photos, descriptions, and, most importantly, define their **"Booking Products"**—setting the price and quantity for Day Passes, Monthly Desks, etc.
+*   **[H-4] The Host Inbox & Earnings:** A unified inbox for all member communications and a clean dashboard showing a breakdown of (dummy) earnings.
 
-#### **Part 4: The Platform Admin Journey**
+#### **Part 4: Enterprise Experience (`/enterprise`)** ⭐ **NEW FLAGSHIP FEATURE**
 
-*   **[SYS-1] The Marketplace Health Dashboard:** A "God's-eye view" of the entire platform. Features `recharts`-powered visualizations of KPIs, including a breakdown of revenue and growth by Host Type ("Corporate Hubs" vs. "Pro Workspaces").
-*   **[SYS-2] Central Management Modules:** A series of clean, powerful tables for managing all users, listings, and the **Hub Ambassador Program**. Includes simulated actions like "Feature Listing" and "Assign Ambassador."
+*   **[E-1] Enterprise Landing Page:** Comprehensive page showcasing WorkFlex Benefits program with three-tier pricing (StartupFlex, ScaleFlex, EnterpriseFlex), ROI calculators, and enterprise-focused messaging.
+*   **[E-2] Corporate Onboarding Modal:** Multi-step onboarding flow for companies including company information, admin setup, plan selection, and policy configuration.
+*   **[E-3] Corporate Dashboard:** Enterprise admin interface showing:
+    *   **Usage Analytics:** Employee adoption rates, credit utilization, popular locations
+    *   **Cost Management:** Real-time spending, budget alerts, cost savings vs traditional office
+    *   **Employee Management:** Active users, booking approvals, policy enforcement
+    *   **ROI Tracking:** Comprehensive metrics demonstrating value of the program
+*   **[E-4] Employee Booking Widget:** Specialized booking interface for corporate employees showing:
+    *   **Company Credit Integration:** Booking using company credits instead of personal payment
+    *   **Policy Compliance:** Automatic enforcement of company booking policies
+    *   **Approval Workflows:** Integration with company approval processes
+    *   **Zero-Friction Experience:** No expense reports or personal financial burden
+
+#### **Part 5: The Platform Admin Journey**
+
+*   **[SYS-1] The Marketplace Health Dashboard:** A "God's-eye view" of the entire platform. Features `recharts`-powered visualizations of KPIs, including a breakdown of revenue and growth by Host Type ("Corporate Hubs" vs. "Pro Workspaces") **and new Corporate Benefits revenue streams.**
+*   **[SYS-2] Central Management Modules:** A series of clean, powerful tables for managing all users, listings, **corporate accounts,** and the **Hub Ambassador Program**. Includes simulated actions like "Feature Listing," "Assign Ambassador," and **"Manage Corporate Plans."**
 *   **[SYS-3] Trust & Safety Queues:** UI mockups of a moderation queue for user reports and a feedback inbox, demonstrating the platform's commitment to quality and safety.
 
 ---

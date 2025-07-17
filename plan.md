@@ -4,6 +4,21 @@
 
 **Guiding Principle:** Emulate the "Airbnb look and feel"—clean, spacious, photo-first, intuitive, and trustworthy.
 
+**Strategic Focus:** The prototype now emphasizes our **four target group experiences** with dedicated pages and user journeys for Individual Professionals (`/members`), Workspace Hosts (`/hosts`), Enterprise Companies (`/enterprise`), and Platform Admins.
+
+---
+
+## ⭐ **NEW: Target Group Strategy Implementation**
+
+The prototype is organized around four distinct user experiences:
+
+1. **Individual Professionals** (`/members`) - Freelancers, remote workers, startup founders, digital nomads
+2. **Workspace Hosts** (`/hosts`) - Corporate hosts and professional space providers  
+3. **Enterprise Companies** (`/enterprise`) - **FLAGSHIP: WorkFlex Benefits Program**
+4. **Platform Administration** - Marketplace oversight and management
+
+Each target group has a dedicated landing page, tailored user journey, and specialized dashboard experience.
+
 ---
 
 ## Phase 0: Project Foundation & Setup
@@ -32,14 +47,17 @@
 **Prompt 0.4: Tailwind CSS Configuration**
 "Let's configure Tailwind CSS for a clean, Airbnb-like aesthetic. Open `tailwind.config.ts` and extend the theme. Add a custom font family (e.g., Inter), and define a primary brand color. For now, let's use a modern, trustworthy blue, but we can change it later. Also, ensure the JIT compiler is configured to scan all our component directories for class names."
 
-**Prompt 0.5: Dummy Data Structure (The "Brain" of the Prototype)**
+**Prompt 0.5: Enhanced Dummy Data Structure (The "Brain" of the Prototype)**
 "This is a critical step. Create a new file at `lib/dummy-data.ts`. In this file, define and export a comprehensive set of dummy data. The structure should include:
-1.  An array of `User` objects. Each user needs an `id`, `name`, `email`, `role` (`corporate-host`, `pro-provider`, `member`, `sys-admin`, `hub-ambassador`), `profileImageUrl`, `company`, `title`, and `bio`. Create at least one of each role.
+1.  An array of `User` objects. Each user needs an `id`, `name`, `email`, `role` (`corporate-host`, `pro-provider`, `member`, `sys-admin`, `hub-ambassador`, `corporate-admin`, `corporate-employee`), `profileImageUrl`, `company`, `title`, and `bio`. Create at least one of each role.
 2.  An array of `Space` objects. Each space needs an `id`, `title`, `hostId` (linking to a User), `type` (`Corporate Hub` or `Pro Workspace`), `location`, `pricePerMonth`, `pricePerDay`, an array of `imageUrls`, an array of `amenities`, and a `description`.
 3.  An array of `BookingProduct` objects for each space, detailing `type` (Day Pass, Monthly Desk), `price`, and `quantity`.
 4.  An array of `Review` objects, each with a `spaceId`, `userId`, `rating`, and `comment`.
 5.  An array of `Match` objects for a specific member, each with a `targetUserId` and a hardcoded `matchReason`.
-6.  An array of `ChatMessage` objects for a specific conversation, creating a scripted dialogue."
+6.  An array of `ChatMessage` objects for a specific conversation, creating a scripted dialogue.
+7.  **NEW:** `Company` objects for the WorkFlex Benefits program with subscription plans, credit allowances, and settings.
+8.  **NEW:** `EmployeeBooking` objects linking corporate employees to workspace bookings using company credits.
+9.  **NEW:** `CorporateDashboardMetrics` objects showing usage analytics, cost savings, and employee satisfaction data."
 
 **Prompt 0.6: Global State Management (Zustand)**
 "Create a new file at `store/authStore.ts`. Set up a Zustand store to handle our simulated authentication. The store should contain:
@@ -145,34 +163,90 @@
 
 ---
 
-## Phase 4: The "Platform Admin" View
+## 🚀 **NEW Phase 4: Target Group Experiences**
 
-*(**Goal:** Demonstrate the oversight capabilities for the ShareYourSpace team.)*
+*(**Goal:** Create dedicated pages and user journeys for each of our four target groups.)*
 
-**Prompt 4.1: The Admin Dashboard**
-"Create a new route group `/admin`. The main page at `/admin/dashboard/page.tsx` should be protected, only rendering if the `currentUser.role` is `sys-admin`.
-1.  The dashboard should feature large, clear charts using the `recharts` library, visualizing the KPI data from `dummy-data.ts`.
-2.  Include widgets that compare the performance of 'Corporate Hubs' vs. 'Pro Workspaces'."
+**Prompt 4.1: Individual Professionals Page (`/members`)**
+"Create a comprehensive `/members/page.tsx` that showcases our value proposition for individual professionals:
+1. Hero section with member type selector (Freelancers, Remote Workers, Startup Founders, Digital Nomads)
+2. Dynamic content that adapts based on selected member type
+3. Benefits showcase (Premium Amenities, Professional Network, Flexible Booking, Vetted Community)
+4. Featured workspace previews with pricing
+5. Membership plan comparison (Explorer, Professional, Executive)
+6. Strong call-to-action to join the community"
 
-**Prompt 4.2: Admin Management Tables**
-"Create pages under `/admin` for 'Users' and 'Listings'. Each page should display a clean, searchable table of all the corresponding items from our dummy data, with buttons for simulated actions like 'Verify' or 'Feature'."
+**Prompt 4.2: Workspace Hosts Page (`/hosts`)**
+"Create a dynamic `/hosts/page.tsx` that serves both Corporate Hosts and Professional Space Providers:
+1. Hero section with host type toggle (Corporate Host vs Professional Provider)
+2. Dynamic benefits section that changes based on selected host type
+3. Success stories showcasing real revenue examples
+4. 'How It Works' process explanation
+5. Feature comparison between host types
+6. Dual call-to-action for both host types"
+
+**Prompt 4.3: Enterprise Landing Page (`/enterprise`)** ⭐ **FLAGSHIP FEATURE**
+"Create a comprehensive `/enterprise/page.tsx` showcasing our WorkFlex Benefits program:
+1. Hero section with compelling enterprise messaging and statistics
+2. Benefits showcase (Zero Employee Friction, Complete Cost Control, Enterprise Security, Global Access)
+3. Use case scenarios (Distributed Teams, Business Travel, Project Teams, Talent Acquisition)
+4. Three-tier pricing display (StartupFlex, ScaleFlex, EnterpriseFlex)
+5. Success metrics and testimonials
+6. Strong enterprise-focused call-to-action with trial offers"
+
+**Prompt 4.4: Corporate Onboarding Flow**
+"Create `CorporateOnboardingModal.tsx` component for enterprise customer onboarding:
+1. Multi-step wizard (Company Info, Admin Contact, Plan Selection, Policy Configuration)
+2. Plan comparison with features and pricing
+3. Policy configuration (auto-approval, booking duration limits, allowed categories)
+4. Professional, enterprise-grade UI design
+5. Integration with dummy corporate data"
+
+**Prompt 4.5: Corporate Dashboard & Employee Experience**
+"Create `CorporateDashboard.tsx` and `EmployeeBookingWidget.tsx`:
+1. Corporate admin dashboard with usage analytics, cost tracking, employee management
+2. Employee booking widget with company credit integration
+3. Policy enforcement and approval workflows
+4. Credit utilization tracking and budget alerts
+5. Real-time usage metrics and ROI calculations"
+
+**Prompt 4.6: Homepage Navigation Update**
+"Update the homepage to include target group navigation:
+1. Add navigation links in Header.tsx for /members, /hosts, /enterprise
+2. Replace corporate benefits section with target group quick access cards
+3. Each card should have distinct messaging and call-to-action for its target group
+4. Emphasize the enterprise offering as the flagship feature"
 
 ---
 
-## Phase 5: Finalization & Deployment
+## 🔄 **Updated Phase 5: Platform Admin & Data Enhancement**
 
-*(**Goal:** Polish the application and get it live on the web.)*
+*(**Goal:** Polish the application, enhance data management, and get it live on the web.)*
 
-**Prompt 5.1: Responsiveness Check**
+**Prompt 5.1: Admin Dashboard Enhancements**
+"Revamp the admin dashboard at `/admin/dashboard/page.tsx`:
+1.  Incorporate new KPI charts and tables for user and listing statistics.
+2.  Add date range filtering and export options for reports.
+3.  Implement a notification system for admin alerts (e.g., new user sign-ups, listing approvals)."
+
+**Prompt 5.2: Admin Management Tables**
+"Create pages under `/admin` for 'Users' and 'Listings'. Each page should display a clean, searchable table of all the corresponding items from our dummy data, with buttons for simulated actions like 'Verify' or 'Feature'."
+
+**Prompt 5.3: Corporate Data Integration**
+"Integrate dummy corporate data for enterprise features:
+1.  Pre-fill corporate onboarding flow with sample data for demonstration.
+2.  Populate corporate dashboard with usage analytics and employee data."
+
+**Prompt 5.4: Responsiveness Check**
 "Let's go through every page and component we've built (`HomePage`, `ListingPage`, `Dashboard`, etc.) and ensure they are fully responsive. Use Tailwind's responsive breakpoints (`sm`, `md`, `lg`) to adjust layouts for mobile, tablet, and desktop. The mobile experience should be as clean and usable as the desktop one."
 
-**Prompt 5.2: Adding Motion & Polish**
+**Prompt 5.5: Adding Motion & Polish**
 "Now, let's use `framer-motion` to add subtle, professional animations to elevate the user experience.
 1.  Animate the appearance of cards in the `DiscoverySection` and `MatchCard` grids using a staggered fade-in effect.
 2.  Add a smooth transition effect to page changes.
 3.  Animate the opening and closing of modals."
 
-**Prompt 5.3: Deployment to Vercel**
+**Prompt 5.6: Deployment to Vercel**
 "This project is ready for deployment.
 1.  Push the entire project to a new GitHub repository.
 2.  Log in to Vercel and create a new project, importing from that GitHub repository.

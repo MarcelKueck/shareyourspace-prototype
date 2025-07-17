@@ -35,9 +35,15 @@ export default function Header() {
 
             {/* Navigation */}
             <div className="flex items-center space-x-6">
-              <button className="text-gray-700 hover:text-primary font-medium transition-colors">
-                List Your Space
-              </button>
+              <a href="/hosts" className="text-gray-700 hover:text-primary font-medium transition-colors">
+                Become a Host
+              </a>
+              <a href="/members" className="text-gray-700 hover:text-primary font-medium transition-colors">
+                For Members
+              </a>
+              <a href="/enterprise" className="text-gray-700 hover:text-primary font-medium transition-colors">
+                For Enterprise
+              </a>
               
               {/* User Profile / Login */}
               <div className="relative">

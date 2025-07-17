@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { Search, MapPin, Calendar, Users, ChevronDown, Building, Zap, Globe } from 'lucide-react';
-import { spaces } from './lib/dummy-data';
+import { spaces, bookingProducts } from './lib/dummy-data';
 import DiscoverySection from './components/pages/DiscoverySection';
 
 export default function HomePage() {
@@ -73,7 +73,7 @@ export default function HomePage() {
           </div>
           
           {/* Enhanced WeWork-style Search Bar */}
-          <div className="mt-16 max-w-6xl mx-auto relative z-[9999]">
+          <div className="mt-16 max-w-7xl mx-auto relative z-[9999]">
             <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-2 shadow-2xl transition-all duration-500 hover:shadow-3xl relative z-[9999]" onClick={handleSearchBarClick}>
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
                 
@@ -84,11 +84,11 @@ export default function HomePage() {
                   }`}
                   onClick={() => setActiveSearchField('location')}
                 >
-                  <div className="p-6 rounded-2xl hover:bg-gray-50/80 transition-all duration-200">
-                    <div className="flex items-start space-x-4">
-                      <MapPin className="w-6 h-6 text-blue-500 mt-1 flex-shrink-0" />
+                  <div className="p-4 rounded-2xl hover:bg-gray-50/80 transition-all duration-200">
+                    <div className="flex items-center space-x-3">
+                      <MapPin className="w-5 h-5 text-blue-500 flex-shrink-0" />
                       <div className="flex-1 text-left">
-                        <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                        <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
                           Location
                         </label>
                         <input
@@ -96,7 +96,7 @@ export default function HomePage() {
                           value={location}
                           onChange={(e) => setLocation(e.target.value)}
                           placeholder="Search destinations"
-                          className="w-full text-gray-900 placeholder-gray-500 bg-transparent border-none outline-none text-lg font-medium focus:placeholder-gray-400"
+                          className="w-full text-gray-900 placeholder-gray-500 bg-transparent border-none outline-none text-base font-medium focus:placeholder-gray-400"
                         />
                       </div>
                     </div>
@@ -114,18 +114,18 @@ export default function HomePage() {
                     setShowBookingDropdown(false);
                   }}
                 >
-                  <div className="p-6 rounded-2xl hover:bg-gray-50/80 transition-all duration-200">
-                    <div className="flex items-start space-x-4">
-                      <Building className="w-6 h-6 text-purple-500 mt-1 flex-shrink-0" />
+                  <div className="p-4 rounded-2xl hover:bg-gray-50/80 transition-all duration-200">
+                    <div className="flex items-center space-x-3">
+                      <Building className="w-5 h-5 text-purple-500 flex-shrink-0" />
                       <div className="flex-1 text-left">
-                        <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                        <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
                           Workspace Type
                         </label>
-                        <div className="text-lg font-medium text-gray-900">
+                        <div className="text-base font-medium text-gray-900">
                           {workspaceType || 'Choose workspace style'}
                         </div>
                       </div>
-                      <ChevronDown className={`w-5 h-5 text-gray-400 mt-2 flex-shrink-0 transition-transform duration-200 ${showWorkspaceDropdown ? 'rotate-180' : ''}`} />
+                      <ChevronDown className={`w-4 h-4 text-gray-400 flex-shrink-0 transition-transform duration-200 ${showWorkspaceDropdown ? 'rotate-180' : ''}`} />
                     </div>
                   </div>
                   
@@ -138,13 +138,13 @@ export default function HomePage() {
                           setWorkspaceType('Corporate Hub');
                           setShowWorkspaceDropdown(false);
                         }}
-                        className="p-6 hover:bg-blue-50 transition-colors duration-200 border-b border-gray-100 cursor-pointer"
+                        className="p-4 hover:bg-blue-50 transition-colors duration-200 border-b border-gray-100 cursor-pointer"
                       >
-                        <div className="flex items-start space-x-4">
-                          <div className="w-3 h-3 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
                           <div>
-                            <h4 className="font-bold text-gray-900 mb-1">Corporate Hub</h4>
-                            <p className="text-sm text-gray-600">Work alongside companies and their teams. Perfect for networking and collaboration opportunities.</p>
+                            <h4 className="font-bold text-gray-900">Corporate Hub</h4>
+                            <p className="text-xs text-gray-600">Network with companies & teams</p>
                           </div>
                         </div>
                       </div>
@@ -154,13 +154,13 @@ export default function HomePage() {
                           setWorkspaceType('Pro Workspace');
                           setShowWorkspaceDropdown(false);
                         }}
-                        className="p-6 hover:bg-purple-50 transition-colors duration-200 cursor-pointer"
+                        className="p-4 hover:bg-purple-50 transition-colors duration-200 cursor-pointer"
                       >
-                        <div className="flex items-start space-x-4">
-                          <div className="w-3 h-3 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
+                        <div className="flex items-center space-x-3">
+                          <div className="w-3 h-3 bg-purple-500 rounded-full flex-shrink-0"></div>
                           <div>
-                            <h4 className="font-bold text-gray-900 mb-1">Pro Workspace</h4>
-                            <p className="text-sm text-gray-600">Dedicated professional spaces with Hub Ambassadors. Focused, productive environments.</p>
+                            <h4 className="font-bold text-gray-900">Pro Workspace</h4>
+                            <p className="text-xs text-gray-600">Professional spaces with ambassadors</p>
                           </div>
                         </div>
                       </div>
@@ -179,18 +179,18 @@ export default function HomePage() {
                     setShowWorkspaceDropdown(false);
                   }}
                 >
-                  <div className="p-6 rounded-2xl hover:bg-gray-50/80 transition-all duration-200">
-                    <div className="flex items-start space-x-4">
-                      <Calendar className="w-6 h-6 text-green-500 mt-1 flex-shrink-0" />
+                  <div className="p-4 rounded-2xl hover:bg-gray-50/80 transition-all duration-200">
+                    <div className="flex items-center space-x-3">
+                      <Calendar className="w-5 h-5 text-green-500 flex-shrink-0" />
                       <div className="flex-1 text-left">
-                        <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-2">
+                        <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
                           Booking Type
                         </label>
-                        <div className="text-lg font-medium text-gray-900">
+                        <div className="text-base font-medium text-gray-900">
                           {bookingType || 'Select your plan'}
                         </div>
                       </div>
-                      <ChevronDown className={`w-5 h-5 text-gray-400 mt-2 flex-shrink-0 transition-transform duration-200 ${showBookingDropdown ? 'rotate-180' : ''}`} />
+                      <ChevronDown className={`w-4 h-4 text-gray-400 flex-shrink-0 transition-transform duration-200 ${showBookingDropdown ? 'rotate-180' : ''}`} />
                     </div>
                   </div>
                   
@@ -203,17 +203,17 @@ export default function HomePage() {
                           setBookingType('Day Pass');
                           setShowBookingDropdown(false);
                         }}
-                        className="p-6 hover:bg-green-50 transition-colors duration-200 border-b border-gray-100 cursor-pointer"
+                        className="p-4 hover:bg-green-50 transition-colors duration-200 border-b border-gray-100 cursor-pointer"
                       >
-                        <div className="flex items-start space-x-4">
-                          <div className="w-3 h-3 bg-green-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <div className="flex-1">
-                            <div className="flex justify-between items-start mb-1">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-3 h-3 bg-green-500 rounded-full flex-shrink-0"></div>
+                            <div>
                               <h4 className="font-bold text-gray-900">Day Pass</h4>
-                              <span className="text-sm font-semibold text-green-600">From $25/day</span>
+                              <p className="text-xs text-gray-600">Try spaces & short projects</p>
                             </div>
-                            <p className="text-sm text-gray-600">Perfect for trying out spaces or short-term projects. Full access for the day.</p>
                           </div>
+                          <span className="text-sm font-semibold text-green-600">From $25</span>
                         </div>
                       </div>
                       <div 
@@ -222,17 +222,17 @@ export default function HomePage() {
                           setBookingType('Monthly Desk');
                           setShowBookingDropdown(false);
                         }}
-                        className="p-6 hover:bg-blue-50 transition-colors duration-200 border-b border-gray-100 cursor-pointer"
+                        className="p-4 hover:bg-blue-50 transition-colors duration-200 border-b border-gray-100 cursor-pointer"
                       >
-                        <div className="flex items-start space-x-4">
-                          <div className="w-3 h-3 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <div className="flex-1">
-                            <div className="flex justify-between items-start mb-1">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
+                            <div>
                               <h4 className="font-bold text-gray-900">Monthly Desk</h4>
-                              <span className="text-sm font-semibold text-blue-600">From $200/month</span>
+                              <p className="text-xs text-gray-600">Dedicated desk with storage</p>
                             </div>
-                            <p className="text-sm text-gray-600">Your dedicated desk with storage. Build relationships and establish routine.</p>
                           </div>
+                          <span className="text-sm font-semibold text-blue-600">From $200</span>
                         </div>
                       </div>
                       <div 
@@ -241,17 +241,17 @@ export default function HomePage() {
                           setBookingType('Private Office');
                           setShowBookingDropdown(false);
                         }}
-                        className="p-6 hover:bg-purple-50 transition-colors duration-200 cursor-pointer"
+                        className="p-4 hover:bg-purple-50 transition-colors duration-200 cursor-pointer"
                       >
-                        <div className="flex items-start space-x-4">
-                          <div className="w-3 h-3 bg-purple-500 rounded-full mt-2 flex-shrink-0"></div>
-                          <div className="flex-1">
-                            <div className="flex justify-between items-start mb-1">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-3 h-3 bg-purple-500 rounded-full flex-shrink-0"></div>
+                            <div>
                               <h4 className="font-bold text-gray-900">Private Office</h4>
-                              <span className="text-sm font-semibold text-purple-600">From $800/month</span>
+                              <p className="text-xs text-gray-600">Enclosed space for teams</p>
                             </div>
-                            <p className="text-sm text-gray-600">Enclosed space for teams. Privacy, security, and professional environment.</p>
                           </div>
+                          <span className="text-sm font-semibold text-purple-600">From $800</span>
                         </div>
                       </div>
                     </div>
@@ -260,8 +260,8 @@ export default function HomePage() {
 
                 {/* Search Button */}
                 <div className="p-2">
-                  <button className="w-full h-full bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 text-white rounded-2xl font-bold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center justify-center space-x-3 min-h-[88px] text-lg">
-                    <Search className="w-6 h-6" />
+                  <button className="w-full h-full bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 text-white rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center justify-center space-x-2 min-h-[64px] text-base">
+                    <Search className="w-5 h-5" />
                     <span>Search</span>
                   </button>
                 </div>
@@ -337,19 +337,158 @@ export default function HomePage() {
 
       {/* Discovery Sections */}
       <div className="bg-white">
+        {/* Target Groups Quick Access */}
+        <section className="py-16 bg-gradient-to-br from-gray-50 to-blue-50">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+                Perfect for Every Professional
+              </h2>
+              <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+                Whether you&apos;re an individual looking for workspace or a company wanting to provide flexible benefits, 
+                we have the perfect solution for you.
+              </p>
+            </div>
+            
+            <div className="grid md:grid-cols-3 gap-8">
+              {/* Individual Members */}
+              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <Users className="w-8 h-8 text-green-600" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">For Professionals</h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Freelancers, remote workers, startup founders, and digital nomads - find your perfect workspace community.
+                </p>
+                <ul className="text-sm text-gray-600 space-y-2 mb-8">
+                  <li>• Flexible booking from 1 hour to 12 months</li>
+                  <li>• Premium workspaces in 50+ cities</li>
+                  <li>• Professional networking opportunities</li>
+                  <li>• No long-term commitments</li>
+                </ul>
+                <a 
+                  href="/members"
+                  className="inline-flex items-center justify-center w-full py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
+                >
+                  Explore Workspaces
+                  <Globe className="w-4 h-4 ml-2" />
+                </a>
+              </div>
+
+              {/* Hosts */}
+              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 group">
+                <div className="w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                  <Building className="w-8 h-8 text-purple-600" />
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">For Hosts</h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Corporate offices and professional space providers - monetize your underutilized space and build community.
+                </p>
+                <ul className="text-sm text-gray-600 space-y-2 mb-8">
+                  <li>• Earn up to $25k/month from empty desks</li>
+                  <li>• AI-powered talent matching</li>
+                  <li>• Professional marketing support</li>
+                  <li>• Vetted member community</li>
+                </ul>
+                <a 
+                  href="/hosts"
+                  className="inline-flex items-center justify-center w-full py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors"
+                >
+                  Start Hosting
+                  <Building className="w-4 h-4 ml-2" />
+                </a>
+              </div>
+
+              {/* Enterprise */}
+              <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 group border-2 border-blue-200">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Zap className="w-8 h-8 text-blue-600" />
+                  </div>
+                  <span className="bg-blue-100 text-blue-800 text-xs font-medium px-3 py-1 rounded-full">
+                    Most Popular
+                  </span>
+                </div>
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">For Enterprise</h3>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Companies of all sizes - offer workspace flexibility as an employee benefit and transform your workplace strategy.
+                </p>
+                <ul className="text-sm text-gray-600 space-y-2 mb-8">
+                  <li>• Zero employee friction with company credits</li>
+                  <li>• Predictable monthly costs</li>
+                  <li>• Global workspace access for teams</li>
+                  <li>• Enterprise security & compliance</li>
+                </ul>
+                <a 
+                  href="/enterprise"
+                  className="inline-flex items-center justify-center w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
+                >
+                  Transform Your Benefits
+                  <Zap className="w-4 h-4 ml-2" />
+                </a>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Featured Workspaces */}
         <DiscoverySection 
           title="Featured Workspaces" 
           spaces={featuredSpaces} 
         />
         
+        {/* Day Pass Friendly */}
+        <DiscoverySection 
+          title="Perfect for Day Passes" 
+          spaces={spaces.filter(space => 
+            bookingProducts.some(bp => 
+              bp.spaceId === space.id && bp.type === 'Day Pass'
+            )
+          ).slice(0, 8)} 
+        />
+        
+        {/* Monthly Desks */}
+        <DiscoverySection 
+          title="Monthly Desk Options" 
+          spaces={spaces.filter(space => 
+            bookingProducts.some(bp => 
+              bp.spaceId === space.id && bp.type === 'Monthly Desk'
+            )
+          ).slice(0, 8)} 
+        />
+        
+        {/* Private Offices */}
+        <DiscoverySection 
+          title="Private Office Suites" 
+          spaces={spaces.filter(space => 
+            bookingProducts.some(bp => 
+              bp.spaceId === space.id && bp.type === 'Private Office'
+            )
+          ).slice(0, 8)} 
+        />
+        
+        {/* Corporate Hubs */}
         <DiscoverySection 
           title="Corporate Innovation Hubs" 
           spaces={corporateHubs} 
         />
         
+        {/* Professional Workspaces */}
         <DiscoverySection 
           title="Professional Workspaces" 
           spaces={proWorkspaces} 
+        />
+        
+        {/* Premium Locations */}
+        <DiscoverySection 
+          title="Premium Locations" 
+          spaces={spaces.filter(space => space.pricePerMonth > 400).slice(0, 8)} 
+        />
+        
+        {/* Budget-Friendly */}
+        <DiscoverySection 
+          title="Great Value Workspaces" 
+          spaces={spaces.filter(space => space.pricePerMonth <= 300).slice(0, 8)} 
         />
       </div>
     </div>
