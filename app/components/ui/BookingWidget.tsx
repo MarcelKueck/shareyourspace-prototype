@@ -9,7 +9,7 @@ interface BookingWidgetProps {
 }
 
 export default function BookingWidget({ space }: BookingWidgetProps) {
-  const [selectedBookingType, setSelectedBookingType] = useState<'Day Pass' | 'Monthly Desk'>('Monthly Desk');
+  const [selectedBookingType, setSelectedBookingType] = useState<'Day Pass' | 'Monthly Desk' | 'Private Office'>('Monthly Desk');
   const [checkInDate, setCheckInDate] = useState('');
   const [guests, setGuests] = useState(1);
 
