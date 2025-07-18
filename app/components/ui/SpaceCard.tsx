@@ -1,10 +1,11 @@
 'use client';
 
-import { Heart, Star, Clock, CheckCircle } from 'lucide-react';
+import { Heart, Star, Clock, CheckCircle, Users, Shield, Award } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Space, getSpacePricing, getAvailableBookingTypes } from '../../lib/dummy-data';
+import { Space, getSpacePricing, getAvailableBookingTypes, getSpaceTeamCapacity, hasHostBenefits } from '../../lib/dummy-data';
+import { useAuthStore } from '../../store/authStore';
 
 interface SpaceCardProps {
   space: Space;
@@ -12,9 +13,16 @@ interface SpaceCardProps {
 
 export default function SpaceCard({ space }: SpaceCardProps) {
   const [isWishlisted, setIsWishlisted] = useState(false);
+  const { currentUser, corporateAllowance } = useAuthStore();
   
   const pricing = getSpacePricing(space.id);
   const availableBookings = getAvailableBookingTypes(space.id);
+  const teamCapacity = getSpaceTeamCapacity(space.id);
+  const hostHasCorpBenefits = hasHostBenefits(space.id);
+  const isVerifiedHost = space.corporateHostBenefits?.isVerifiedHost;
+  
+  // Check if current user's company is also a host and gets cross-benefits
+  const userGetsHostDiscount = currentUser?.companyId && corporateAllowance?.company?.isHost && hostHasCorpBenefits;
 
   return (
     <Link href={`/spaces/${space.id}`} className="group cursor-pointer block">
@@ -47,7 +55,7 @@ export default function SpaceCard({ space }: SpaceCardProps) {
         </button>
 
         {/* Space Type Badge */}
-        <div className="absolute top-3 left-3">
+        <div className="absolute top-3 left-3 flex flex-col space-y-1">
           <span className={`px-2 py-1 text-xs font-medium rounded-full ${
             space.type === 'Corporate Hub' 
               ? 'bg-blue-100 text-blue-800' 
@@ -55,17 +63,40 @@ export default function SpaceCard({ space }: SpaceCardProps) {
           }`}>
             {space.type}
           </span>
+          
+          {/* Verified Host Badge */}
+          {isVerifiedHost && (
+            <span className="px-2 py-1 text-xs font-medium rounded-full bg-orange-100 text-orange-800 flex items-center space-x-1">
+              <Shield className="w-3 h-3" />
+              <span>Verified Host</span>
+            </span>
+          )}
+          
+          {/* Cross-benefits Available */}
+          {userGetsHostDiscount && (
+            <span className="px-2 py-1 text-xs font-medium rounded-full bg-purple-100 text-purple-800 flex items-center space-x-1">
+              <Award className="w-3 h-3" />
+              <span>Host Discount</span>
+            </span>
+          )}
         </div>
 
-        {/* Booking Options Badge */}
-        {availableBookings.length > 1 && (
-          <div className="absolute bottom-3 left-3">
+        {/* Team Capacity and Booking Options Badge */}
+        <div className="absolute bottom-3 left-3 flex space-x-1">
+          {teamCapacity > 1 && (
+            <span className="px-2 py-1 text-xs font-medium rounded-full bg-white/90 text-gray-700 flex items-center space-x-1">
+              <Users className="w-3 h-3" />
+              <span>Team up to {teamCapacity}</span>
+            </span>
+          )}
+          
+          {availableBookings.length > 1 && (
             <span className="px-2 py-1 text-xs font-medium rounded-full bg-white/90 text-gray-700 flex items-center space-x-1">
               <CheckCircle className="w-3 h-3" />
-              <span>{availableBookings.length} booking options</span>
+              <span>{availableBookings.length} options</span>
             </span>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Content */}
@@ -88,6 +119,8 @@ export default function SpaceCard({ space }: SpaceCardProps) {
                   ? 'bg-green-50 text-green-700 border border-green-200'
                   : booking.type === 'Monthly Desk'
                   ? 'bg-blue-50 text-blue-700 border border-blue-200'
+                  : booking.type === 'Team Room'
+                  ? 'bg-orange-50 text-orange-700 border border-orange-200'
                   : 'bg-purple-50 text-purple-700 border border-purple-200'
               }`}
             >
@@ -97,6 +130,13 @@ export default function SpaceCard({ space }: SpaceCardProps) {
           {availableBookings.length > 2 && (
             <span className="px-2 py-1 text-xs rounded-full bg-gray-50 text-gray-600 border border-gray-200">
               +{availableBookings.length - 2} more
+            </span>
+          )}
+          
+          {/* Corporate Coverage Indicator */}
+          {corporateAllowance?.hasAccess && (
+            <span className="px-2 py-1 text-xs rounded-full bg-blue-50 text-blue-700 border border-blue-200 font-medium">
+              Corporate Coverage
             </span>
           )}
         </div>

@@ -1,9 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, MapPin, Calendar, Users, ChevronDown, Building, Zap, Globe } from 'lucide-react';
-import { spaces, bookingProducts } from './lib/dummy-data';
+import { Search, MapPin, Calendar, ChevronDown, Building } from 'lucide-react';
+import { spaces, bookingProducts, popularSearches } from './lib/dummy-data';
 import DiscoverySection from './components/pages/DiscoverySection';
+import TargetGroupCarousel from './components/pages/TargetGroupCarousel';
 
 export default function HomePage() {
   const [activeSearchField, setActiveSearchField] = useState<string | null>(null);
@@ -17,14 +18,6 @@ export default function HomePage() {
   const corporateHubs = spaces.filter(space => space.type === 'Corporate Hub');
   const proWorkspaces = spaces.filter(space => space.type === 'Pro Workspace');
   const featuredSpaces = spaces.slice(0, 6); // First 6 spaces as featured
-
-  const popularSearches = [
-    'Corporate Hubs in San Francisco',
-    'Pro Workspaces in Berlin', 
-    'Monthly Desks in London',
-    'Day Pass in Tokyo',
-    'Private Offices in NYC'
-  ];
 
   // Close dropdowns when clicking outside
   const handleSearchBarClick = (e: React.MouseEvent) => {
@@ -241,7 +234,7 @@ export default function HomePage() {
                           setBookingType('Private Office');
                           setShowBookingDropdown(false);
                         }}
-                        className="p-4 hover:bg-purple-50 transition-colors duration-200 cursor-pointer"
+                        className="p-4 hover:bg-purple-50 transition-colors duration-200 border-b border-gray-100 cursor-pointer"
                       >
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-3">
@@ -252,6 +245,25 @@ export default function HomePage() {
                             </div>
                           </div>
                           <span className="text-sm font-semibold text-purple-600">From $800</span>
+                        </div>
+                      </div>
+                      <div 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setBookingType('Team Room');
+                          setShowBookingDropdown(false);
+                        }}
+                        className="p-4 hover:bg-indigo-50 transition-colors duration-200 cursor-pointer"
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-3 h-3 bg-indigo-500 rounded-full flex-shrink-0"></div>
+                            <div>
+                              <h4 className="font-bold text-gray-900">Team Room</h4>
+                              <p className="text-xs text-gray-600">Collaborative space for groups</p>
+                            </div>
+                          </div>
+                          <span className="text-sm font-semibold text-indigo-600">From $50/hr</span>
                         </div>
                       </div>
                     </div>
@@ -286,176 +298,21 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Enhanced Unified Value Proposition Section */}
-      <section className="py-20 bg-gradient-to-br from-gray-50 to-blue-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
-              The future of flexible workspace, perfect for every professional
-            </h2>
-            <p className="text-xl text-gray-600 max-w-4xl mx-auto leading-relaxed">
-              From corporate hubs fostering innovation to professional workspaces designed for productivity—discover premium locations, 
-              build meaningful connections, and work on your terms with maximum flexibility.
-            </p>
-          </div>
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Individual Members */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 group">
-              <div className="w-16 h-16 bg-green-100 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Users className="w-8 h-8 text-green-600" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">For Professionals</h3>
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                Freelancers, remote workers, startup founders, and digital nomads - find your perfect workspace community.
-              </p>
-              
-              {/* Integrated Value Props */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Globe className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-semibold text-gray-900">Prime Locations</h4>
-                    <p className="text-xs text-gray-600">Global business hubs</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <Zap className="w-4 h-4 text-purple-600" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-semibold text-gray-900">Flexible Terms</h4>
-                    <p className="text-xs text-gray-600">From hours to months</p>
-                  </div>
-                </div>
-              </div>
-
-              <ul className="text-sm text-gray-600 space-y-2 mb-8">
-                <li>• Flexible booking from 1 hour to 12 months</li>
-                <li>• Premium workspaces in 50+ cities</li>
-                <li>• Professional networking opportunities</li>
-                <li>• No long-term commitments</li>
-              </ul>
-              <a 
-                href="/members"
-                className="inline-flex items-center justify-center w-full py-3 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors"
-              >
-                Explore Workspaces
-                <Globe className="w-4 h-4 ml-2" />
-              </a>
-            </div>
-
-            {/* Hosts */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 group">
-              <div className="w-16 h-16 bg-purple-100 rounded-xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                <Building className="w-8 h-8 text-purple-600" />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">For Hosts</h3>
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                Corporate offices and professional space providers - monetize your underutilized space and build community.
-              </p>
-              
-              {/* Integrated Value Props */}
-              <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Users className="w-4 h-4 text-green-600" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-semibold text-gray-900">Community Driven</h4>
-                    <p className="text-xs text-gray-600">Vetted professionals</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Globe className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <div>
-                    <h4 className="text-xs font-semibold text-gray-900">Prime Locations</h4>
-                    <p className="text-xs text-gray-600">High-value areas</p>
-                  </div>
-                </div>
-              </div>
-
-              <ul className="text-sm text-gray-600 space-y-2 mb-8">
-                <li>• Earn up to $25k/month from empty desks</li>
-                <li>• AI-powered talent matching</li>
-                <li>• Professional marketing support</li>
-                <li>• Vetted member community</li>
-              </ul>
-              <a 
-                href="/hosts"
-                className="inline-flex items-center justify-center w-full py-3 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-colors"
-              >
-                Start Hosting
-                <Building className="w-4 h-4 ml-2" />
-              </a>
-            </div>
-
-            {/* Enterprise */}
-            <div className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 group border-2 border-blue-200">
-              <div className="flex items-center justify-between mb-4">
-                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Zap className="w-8 h-8 text-blue-600" />
-                </div>
-                <span className="bg-blue-100 text-blue-800 text-xs font-medium px-3 py-1 rounded-full">
-                  Most Popular
-                </span>
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">For Enterprise</h3>
-              <p className="text-gray-600 mb-6 leading-relaxed">
-                Companies of all sizes - offer workspace flexibility as an employee benefit and transform your workplace strategy.
-              </p>
-              
-              {/* Integrated Value Props - All Three for Enterprise */}
-              <div className="grid grid-cols-3 gap-2 mb-6">
-                <div className="flex flex-col items-center space-y-1">
-                  <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <Globe className="w-4 h-4 text-blue-600" />
-                  </div>
-                  <div className="text-center">
-                    <h4 className="text-xs font-semibold text-gray-900">Global Access</h4>
-                  </div>
-                </div>
-                <div className="flex flex-col items-center space-y-1">
-                  <div className="w-8 h-8 bg-green-100 rounded-lg flex items-center justify-center">
-                    <Users className="w-4 h-4 text-green-600" />
-                  </div>
-                  <div className="text-center">
-                    <h4 className="text-xs font-semibold text-gray-900">Team Building</h4>
-                  </div>
-                </div>
-                <div className="flex flex-col items-center space-y-1">
-                  <div className="w-8 h-8 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <Zap className="w-4 h-4 text-purple-600" />
-                  </div>
-                  <div className="text-center">
-                    <h4 className="text-xs font-semibold text-gray-900">Total Flexibility</h4>
-                  </div>
-                </div>
-              </div>
-
-              <ul className="text-sm text-gray-600 space-y-2 mb-8">
-                <li>• Zero employee friction with company credits</li>
-                <li>• Predictable monthly costs</li>
-                <li>• Global workspace access for teams</li>
-                <li>• Enterprise security & compliance</li>
-              </ul>
-              <a 
-                href="/enterprise"
-                className="inline-flex items-center justify-center w-full py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors"
-              >
-                Transform Your Benefits
-                <Zap className="w-4 h-4 ml-2" />
-              </a>
-            </div>
-          </div>
+      {/* Dynamic Target Group Solutions Section */}
+      <section className="py-24 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-full" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }}></div>
         </div>
+        
+        <TargetGroupCarousel />
       </section>
 
       {/* Discovery Sections */}
       <div className="bg-white">
+        {/* Featured Workspaces */}
         <DiscoverySection 
           title="Featured Workspaces" 
           spaces={featuredSpaces} 
@@ -487,6 +344,16 @@ export default function HomePage() {
           spaces={spaces.filter(space => 
             bookingProducts.some(bp => 
               bp.spaceId === space.id && bp.type === 'Private Office'
+            )
+          ).slice(0, 8)} 
+        />
+        
+        {/* Team Rooms */}
+        <DiscoverySection 
+          title="Team Collaboration Rooms" 
+          spaces={spaces.filter(space => 
+            bookingProducts.some(bp => 
+              bp.spaceId === space.id && bp.type === 'Team Room'
             )
           ).slice(0, 8)} 
         />

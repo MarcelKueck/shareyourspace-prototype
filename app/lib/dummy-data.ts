@@ -1,6 +1,6 @@
 // lib/dummy-data.ts
 
-export type UserRole = 'corporate-host' | 'pro-provider' | 'member' | 'sys-admin' | 'hub-ambassador' | 'corporate-admin' | 'corporate-employee';
+export type UserRole = 'corporate-host' | 'pro-provider' | 'member' | 'corporate-employee' | 'corporate-admin' | 'corporate-executive' | 'sys-admin' | 'hub-ambassador';
 
 export interface User {
   id: string;
@@ -9,8 +9,32 @@ export interface User {
   role: UserRole;
   profileImageUrl: string;
   company: string;
+  companyId?: string;
   title: string;
   bio: string;
+  corporateBenefits?: {
+    hasAccess: boolean;
+    allowanceRemaining: number;
+    monthlyAllowance: number;
+    usedThisMonth: number;
+  };
+}
+
+export interface Company {
+  id: string;
+  name: string;
+  domain: string;
+  subscriptionPlan: 'Startup Pack' | 'Growth Pack' | 'Enterprise Pack' | 'Enterprise Unlimited';
+  employeeCount: number;
+  monthlyAllowance: number;
+  hostingRevenue: number;
+  earnedCredits: number;
+  isHost: boolean;
+  crossBenefits: {
+    hostDiscount: number; // percentage
+    priorityAccess: boolean;
+    verifiedBadge: boolean;
+  };
 }
 
 export interface Space {
@@ -24,15 +48,42 @@ export interface Space {
   imageUrls: string[];
   amenities: string[];
   description: string;
+  teamCapacity?: number;
+  corporateHostBenefits?: {
+    isVerifiedHost: boolean;
+    offersEmployeeBenefits: boolean;
+    crossBenefitsAvailable: boolean;
+  };
 }
 
 export interface BookingProduct {
   spaceId: string;
-  type: 'Day Pass' | 'Monthly Desk' | 'Private Office';
+  type: 'Day Pass' | 'Monthly Desk' | 'Private Office' | 'Team Room';
   price: number;
   quantity: number;
   isAvailable: boolean;
   minDuration?: string; // e.g., '1 day', '1 week', '1 month'
+  teamSize?: number; // for Team Room bookings
+}
+
+export interface CorporateBooking {
+  id: string;
+  spaceId: string;
+  teamLeadId: string;
+  teamMembers: string[]; // array of user IDs
+  billingType: 'corporate' | 'mixed' | 'individual';
+  coordinationDetails: {
+    startDate: string;
+    endDate: string;
+    purpose: string;
+    notes: string;
+  };
+  corporateCoverage: {
+    companyId: string;
+    coveredMembers: string[];
+    totalCost: number;
+    companyCoveredAmount: number;
+  };
 }
 
 export interface Review {
@@ -55,69 +106,131 @@ export interface ChatMessage {
   timestamp: string;
 }
 
-// NEW: Corporate Benefits Program Interfaces
-export interface Company {
-  id: string;
-  name: string;
-  domain: string; // for email verification (e.g., "techcorp.com")
-  logo: string;
-  subscriptionPlan: 'StartupFlex' | 'ScaleFlex' | 'EnterpriseFlex';
-  monthlyCredits: number;
-  usedCredits: number;
-  employeeCount: number;
-  adminUserId: string;
-  settings: {
-    autoApproveBookings: boolean;
-    maxBookingDuration: number; // in days
-    allowedCategories: string[];
-    budgetAlerts: boolean;
-  };
-  isActive: boolean;
-  joinedDate: string;
-}
-
-export interface EmployeeBooking {
-  id: string;
-  employeeId: string;
-  companyId: string;
-  spaceId: string;
-  bookingType: string;
-  startDate: string;
-  endDate: string;
-  creditsUsed: number;
-  status: 'pending' | 'approved' | 'active' | 'completed' | 'cancelled';
-  approvedBy?: string;
-}
-
-export interface CorporateDashboardMetrics {
-  companyId: string;
-  month: string;
-  totalBookings: number;
-  activeEmployees: number;
-  creditsUsed: number;
-  costSavings: number; // vs traditional office costs
-  popularLocations: string[];
-  employeeSatisfaction: number;
-}
+// Dummy Companies - German Market Focus
+export const companies: Company[] = [
+  {
+    id: 'comp-1',
+    name: 'SAP Deutschland',
+    domain: 'sap.com',
+    subscriptionPlan: 'Enterprise Pack',
+    employeeCount: 250,
+    monthlyAllowance: 1500,
+    hostingRevenue: 12500,
+    earnedCredits: 1250,
+    isHost: true,
+    crossBenefits: {
+      hostDiscount: 15,
+      priorityAccess: true,
+      verifiedBadge: true
+    }
+  },
+  {
+    id: 'comp-2',
+    name: 'Berlin Startup Hub',
+    domain: 'berlinStartup.de',
+    subscriptionPlan: 'Startup Pack',
+    employeeCount: 15,
+    monthlyAllowance: 100,
+    hostingRevenue: 0,
+    earnedCredits: 0,
+    isHost: false,
+    crossBenefits: {
+      hostDiscount: 0,
+      priorityAccess: false,
+      verifiedBadge: false
+    }
+  },
+  {
+    id: 'comp-3',
+    name: 'Siemens Digital',
+    domain: 'siemens.com',
+    subscriptionPlan: 'Growth Pack',
+    employeeCount: 85,
+    monthlyAllowance: 400,
+    hostingRevenue: 6800,
+    earnedCredits: 680,
+    isHost: true,
+    crossBenefits: {
+      hostDiscount: 15,
+      priorityAccess: true,
+      verifiedBadge: true
+    }
+  },
+  {
+    id: 'comp-4',
+    name: 'Deutsche Bank',
+    domain: 'db.com',
+    subscriptionPlan: 'Enterprise Unlimited',
+    employeeCount: 500,
+    monthlyAllowance: 2000,
+    hostingRevenue: 0,
+    earnedCredits: 0,
+    isHost: false,
+    crossBenefits: {
+      hostDiscount: 0,
+      priorityAccess: false,
+      verifiedBadge: false
+    }
+  },
+  {
+    id: 'comp-5',
+    name: 'Delivery Hero',
+    domain: 'deliveryhero.com',
+    subscriptionPlan: 'Growth Pack',
+    employeeCount: 120,
+    monthlyAllowance: 600,
+    hostingRevenue: 3200,
+    earnedCredits: 320,
+    isHost: true,
+    crossBenefits: {
+      hostDiscount: 10,
+      priorityAccess: true,
+      verifiedBadge: true
+    }
+  },
+  {
+    id: 'comp-6',
+    name: 'Rocket Internet',
+    domain: 'rocket-internet.com',
+    subscriptionPlan: 'Enterprise Pack',
+    employeeCount: 180,
+    monthlyAllowance: 900,
+    hostingRevenue: 15000,
+    earnedCredits: 1500,
+    isHost: true,
+    crossBenefits: {
+      hostDiscount: 20,
+      priorityAccess: true,
+      verifiedBadge: true
+    }
+  }
+];
 
 // Dummy Users
 export const users: User[] = [
   {
     id: 'u1',
     name: 'Alice Corporate',
-    email: 'alice@corp.com',
+    email: 'alice@techcorp.com',
     role: 'corporate-host',
-    profileImageUrl: '/profile/alice.jpg',
+    profileImageUrl: 'https://images.unsplash.com/photo-1494790108755-2616b5e1b8dc?w=150&h=150&fit=crop&crop=face',
     company: 'TechCorp',
+    companyId: 'comp-1',
     title: 'Office Manager',
-    bio: 'Building a culture of innovation at TechCorp.'
+    bio: 'Building a culture of innovation at TechCorp.',
+    corporateBenefits: {
+      hasAccess: true,
+      allowanceRemaining: 800,
+      monthlyAllowance: 1000,
+      usedThisMonth: 200
+    }
   },
   {
     id: 'u2',
     name: 'Bob Provider',
     email: 'bob@provider.com',
     role: 'pro-provider',
-    profileImageUrl: '/profile/bob.jpg',
+    profileImageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
     company: 'WorkspacePro',
     title: 'Property Manager',
     bio: 'Maximizing value for workspace owners.'
@@ -125,19 +238,26 @@ export const users: User[] = [
   {
     id: 'u3',
     name: 'Carol Member',
-    email: 'carol@startup.com',
-    role: 'member',
-    profileImageUrl: '/profile/carol.jpg',
+    email: 'carol@startupx.io',
+    role: 'corporate-employee',
+    profileImageUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
     company: 'StartupX',
+    companyId: 'comp-2',
     title: 'Founder',
-    bio: 'Connecting with innovators everywhere.'
+    bio: 'Connecting with innovators everywhere.',
+    corporateBenefits: {
+      hasAccess: true,
+      allowanceRemaining: 75,
+      monthlyAllowance: 100,
+      usedThisMonth: 25
+    }
   },
   {
     id: 'u4',
     name: 'Dave Admin',
     email: 'dave@sysadmin.com',
     role: 'sys-admin',
-    profileImageUrl: '/profile/dave.jpg',
+    profileImageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
     company: 'ShareYourSpace',
     title: 'Platform Admin',
     bio: 'Ensuring a safe and thriving marketplace.'
@@ -147,7 +267,7 @@ export const users: User[] = [
     name: 'Eve Ambassador',
     email: 'eve@proworkspace.com',
     role: 'hub-ambassador',
-    profileImageUrl: '/profile/eve.jpg',
+    profileImageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&h=150&fit=crop&crop=face',
     company: 'WorkspacePro',
     title: 'Hub Ambassador',
     bio: 'Fostering community at WorkspacePro.'
@@ -155,271 +275,430 @@ export const users: User[] = [
   {
     id: 'u6',
     name: 'Frank Corporate Admin',
-    email: 'frank@techcorp.com',
+    email: 'frank@sap.com',
     role: 'corporate-admin',
-    profileImageUrl: '/profile/frank.jpg',
-    company: 'TechCorp',
-    title: 'Corporate Administrator',
-    bio: 'Managing corporate accounts and employee engagement.'
+    profileImageUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&h=150&fit=crop&crop=face',
+    company: 'SAP SE',
+    companyId: 'comp-1',
+    title: 'HR Director',
+    bio: 'Managing workspace benefits for SAP employees.',
+    corporateBenefits: {
+      hasAccess: true,
+      allowanceRemaining: 1200,
+      monthlyAllowance: 1200,
+      usedThisMonth: 0
+    }
   },
   {
     id: 'u7',
-    name: 'Grace Employee',
-    email: 'grace@techcorp.com',
+    name: 'Grace Executive',
+    email: 'grace@db.com',
+    role: 'corporate-executive',
+    profileImageUrl: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=150&h=150&fit=crop&crop=face',
+    company: 'Deutsche Bank',
+    companyId: 'comp-4',
+    title: 'VP Operations',
+    bio: 'Strategic oversight of global workspace initiatives.',
+    corporateBenefits: {
+      hasAccess: true,
+      allowanceRemaining: 2000,
+      monthlyAllowance: 2000,
+      usedThisMonth: 0
+    }
+  },
+  {
+    id: 'u8',
+    name: 'Henry Remote',
+    email: 'henry@rocket-internet.com',
     role: 'corporate-employee',
-    profileImageUrl: '/profile/grace.jpg',
-    company: 'TechCorp',
-    title: 'Software Engineer',
-    bio: 'Passionate about building scalable web applications.'
+    profileImageUrl: 'https://images.unsplash.com/photo-1519244703995-f4e0f30006d5?w=150&h=150&fit=crop&crop=face',
+    company: 'Rocket Internet',
+    companyId: 'comp-2',
+    title: 'Senior Developer',
+    bio: 'Remote developer who loves flexible workspace options.',
+    corporateBenefits: {
+      hasAccess: true,
+      allowanceRemaining: 320,
+      monthlyAllowance: 400,
+      usedThisMonth: 80
+    }
+  },
+  {
+    id: 'u9',
+    name: 'Iris Freelancer',
+    email: 'iris@freelancer.com',
+    role: 'member',
+    profileImageUrl: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=150&h=150&fit=crop&crop=face',
+    company: 'Independent',
+    title: 'UX Designer',
+    bio: 'Independent designer seeking collaborative workspaces.'
+  },
+  {
+    id: 'u10',
+    name: 'Jack Team Lead',
+    email: 'jack@siemens.com',
+    role: 'corporate-employee',
+    profileImageUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop&crop=face',
+    company: 'Siemens Digital',
+    companyId: 'comp-3',
+    title: 'Product Manager',
+    bio: 'Leading cross-functional teams and organizing offsites.',
+    corporateBenefits: {
+      hasAccess: true,
+      allowanceRemaining: 450,
+      monthlyAllowance: 600,
+      usedThisMonth: 150
+    }
+  },
+  {
+    id: 'u11',
+    name: 'Klaus Müller',
+    email: 'klaus@n26.com',
+    role: 'corporate-employee',
+    profileImageUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face',
+    company: 'N26',
+    companyId: 'comp-6',
+    title: 'Senior Software Engineer',
+    bio: 'Fintech developer passionate about workspace flexibility.',
+    corporateBenefits: {
+      hasAccess: true,
+      allowanceRemaining: 200,
+      monthlyAllowance: 280,
+      usedThisMonth: 80
+    }
+  },
+  {
+    id: 'u12',
+    name: 'Sabine Weber',
+    email: 'sabine@deliveryhero.com',
+    role: 'corporate-employee',
+    profileImageUrl: 'https://images.unsplash.com/photo-1494790108755-2616b612b5bb?w=150&h=150&fit=crop&crop=face',
+    company: 'Delivery Hero',
+    companyId: 'comp-5',
+    title: 'Product Designer',
+    bio: 'Creating user experiences for food delivery platforms.',
+    corporateBenefits: {
+      hasAccess: true,
+      allowanceRemaining: 150,
+      monthlyAllowance: 300,
+      usedThisMonth: 150
+    }
+  },
+  {
+    id: 'u13',
+    name: 'Stefan Hoffmann',
+    email: 'stefan@autoscout24.com',
+    role: 'corporate-employee',
+    profileImageUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face',
+    company: 'AutoScout24',
+    companyId: 'comp-7',
+    title: 'Data Scientist',
+    bio: 'Analyzing automotive market trends and user behavior.',
+    corporateBenefits: {
+      hasAccess: true,
+      allowanceRemaining: 120,
+      monthlyAllowance: 180,
+      usedThisMonth: 60
+    }
+  },
+  {
+    id: 'u14',
+    name: 'Lisa Schmidt',
+    email: 'lisa@berlinstartup.de',
+    role: 'corporate-employee',
+    profileImageUrl: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face',
+    company: 'Berlin Startup Hub',
+    companyId: 'comp-8',
+    title: 'Community Manager',
+    bio: 'Building connections in Berlin startup ecosystem.',
+    corporateBenefits: {
+      hasAccess: true,
+      allowanceRemaining: 40,
+      monthlyAllowance: 85,
+      usedThisMonth: 45
+    }
   }
 ];
 
-// Dummy Spaces - Comprehensive Dataset
+// Dummy Spaces - German Market Focus
 export const spaces: Space[] = [
   // CORPORATE HUBS
   {
     id: 'space-1',
-    title: 'TechCorp Innovation Hub',
+    title: 'SAP Innovation Hub Berlin',
     hostId: 'u1',
     type: 'Corporate Hub',
-    location: 'San Francisco, CA',
-    pricePerMonth: 850,
-    pricePerDay: 45,
+    location: 'Berlin Mitte, Deutschland',
+    pricePerMonth: 720,
+    pricePerDay: 38,
     imageUrls: [
       'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800',
       'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800',
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800'
     ],
-    amenities: ['WiFi', 'Coffee Bar', 'Meeting Rooms', '24/7 Access', 'Parking', 'Gym'],
-    description: 'Premium tech hub in SOMA district with cutting-edge facilities and vibrant startup ecosystem.'
+    amenities: ['Schnelles WLAN', 'Kaffee-Lounge', 'Besprechungsräume', '24/7 Zugang', 'Parkplatz', 'Fitnessraum'],
+    description: 'Modernes Tech-Hub in Berlin Mitte mit innovativen Einrichtungen und lebendiger Startup-Szene.',
+    teamCapacity: 25,
+    corporateHostBenefits: {
+      isVerifiedHost: true,
+      offersEmployeeBenefits: true,
+      crossBenefitsAvailable: true
+    }
   },
   {
     id: 'space-2',
-    title: 'Microsoft Reactor',
+    title: 'Rocket Internet Campus',
     hostId: 'u1',
     type: 'Corporate Hub',
-    location: 'Seattle, WA',
-    pricePerMonth: 750,
-    pricePerDay: 40,
+    location: 'Berlin Kreuzberg, Deutschland',
+    pricePerMonth: 650,
+    pricePerDay: 35,
     imageUrls: [
       'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800',
       'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800',
       'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800'
     ],
-    amenities: ['WiFi', 'Event Space', 'Mentorship', 'Tech Talks', 'Kitchen', 'Lockers'],
-    description: 'Microsoft\'s community hub for developers and entrepreneurs with world-class mentorship programs.'
+    amenities: ['Highspeed Internet', 'Event Space', 'Mentoring', 'Tech Talks', 'Küche', 'Schließfächer'],
+    description: 'Rockets Community Hub für Entwickler und Unternehmer mit erstklassigen Mentoring-Programmen.',
+    teamCapacity: 20,
+    corporateHostBenefits: {
+      isVerifiedHost: true,
+      offersEmployeeBenefits: true,
+      crossBenefitsAvailable: true
+    }
   },
   {
     id: 'space-3',
-    title: 'Google Campus Workspace',
+    title: 'Siemens Digital Factory',
     hostId: 'u1',
     type: 'Corporate Hub',
-    location: 'Mountain View, CA',
-    pricePerMonth: 950,
-    pricePerDay: 50,
+    location: 'München, Deutschland',
+    pricePerMonth: 780,
+    pricePerDay: 42,
     imageUrls: [
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800',
       'https://images.unsplash.com/photo-1497366412874-3415097a27e7?w=800',
       'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800'
     ],
-    amenities: ['WiFi', 'Massage Rooms', 'Nap Pods', 'Gourmet Cafe', 'Bike Rental', 'Meditation Room'],
-    description: 'Experience Google\'s innovative work culture in this premium campus workspace with world-class amenities.'
+    amenities: ['Glasfaser Internet', 'Massage Räume', 'Ruhezonen', 'Gourmet Café', 'Fahrradverleih', 'Meditationsraum'],
+    description: 'Erleben Sie Siemens innovative Arbeitskultur in diesem Premium-Campus-Workspace mit erstklassigen Annehmlichkeiten.',
+    teamCapacity: 30,
+    corporateHostBenefits: {
+      isVerifiedHost: true,
+      offersEmployeeBenefits: true,
+      crossBenefitsAvailable: true
+    }
   },
   {
     id: 'space-4',
-    title: 'Amazon Catalyst Hub',
+    title: 'N26 Fintech Hub',
     hostId: 'u1',
     type: 'Corporate Hub',
-    location: 'Austin, TX',
-    pricePerMonth: 650,
-    pricePerDay: 35,
+    location: 'Berlin Friedrichshain, Deutschland',
+    pricePerMonth: 580,
+    pricePerDay: 32,
     imageUrls: [
       'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800',
       'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800',
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800'
     ],
-    amenities: ['WiFi', 'AWS Credits', 'Product Labs', 'Mentoring', 'Demo Days', 'Networking Events'],
-    description: 'Join Amazon\'s startup accelerator environment with access to AWS services and industry experts.'
+    amenities: ['WiFi', 'Fintech Labs', 'Product Labs', 'Mentoring', 'Demo Days', 'Networking Events'],
+    description: 'Schließen Sie sich N26s Fintech-Accelerator-Umgebung an mit Zugang zu Banking-Services und Branchenexperten.',
+    corporateHostBenefits: {
+      isVerifiedHost: true,
+      offersEmployeeBenefits: true,
+      crossBenefitsAvailable: true
+    }
   },
   {
     id: 'space-5',
-    title: 'Salesforce Trailblazer Hub',
+    title: 'Delivery Hero Tech Campus',
     hostId: 'u1',
     type: 'Corporate Hub',
-    location: 'New York, NY',
-    pricePerMonth: 800,
-    pricePerDay: 42,
+    location: 'Berlin Prenzlauer Berg, Deutschland',
+    pricePerMonth: 690,
+    pricePerDay: 37,
     imageUrls: [
       'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800',
       'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800',
       'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800'
     ],
-    amenities: ['WiFi', 'Salesforce Training', 'CRM Access', 'Customer Success Labs', 'Rooftop Terrace'],
-    description: 'Learn and grow with Salesforce ecosystem partners in this collaborative Manhattan workspace.'
+    amenities: ['WiFi', 'Food Tech Labs', 'Delivery Platform Access', 'Customer Labs', 'Dachterrasse'],
+    description: 'Lernen und wachsen Sie mit Delivery Hero Ecosystem-Partnern in diesem kollaborativen Berliner Workspace.',
+    corporateHostBenefits: {
+      isVerifiedHost: true,
+      offersEmployeeBenefits: true,
+      crossBenefitsAvailable: true
+    }
   },
   {
     id: 'space-6',
-    title: 'IBM Watson Studio',
+    title: 'AutoScout24 Automotive Hub',
     hostId: 'u1',
     type: 'Corporate Hub',
-    location: 'Boston, MA',
-    pricePerMonth: 720,
-    pricePerDay: 38,
+    location: 'München Maxvorstadt, Deutschland',
+    pricePerMonth: 620,
+    pricePerDay: 34,
     imageUrls: [
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800',
       'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800',
       'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800'
     ],
-    amenities: ['WiFi', 'AI Lab', 'Watson Access', 'Research Library', 'Think Tank Rooms'],
-    description: 'Innovation lab focused on AI and machine learning with access to IBM Watson technologies.'
+    amenities: ['WiFi', 'Automotive Lab', 'Test Drive Access', 'Research Library', 'Innovation Räume'],
+    description: 'Innovations-Labor für Automobilindustrie mit Zugang zu AutoScout24 Technologien und Marktdaten.',
+    corporateHostBenefits: {
+      isVerifiedHost: true,
+      offersEmployeeBenefits: true,
+      crossBenefitsAvailable: true
+    }
   },
 
   // PRO WORKSPACES
   {
     id: 'space-7',
-    title: 'Creative Commons Loft',
+    title: 'Kreativloft Hackescher Markt',
     hostId: 'u2',
     type: 'Pro Workspace',
-    location: 'Brooklyn, NY',
-    pricePerMonth: 450,
-    pricePerDay: 25,
+    location: 'Berlin Mitte, Deutschland',
+    pricePerMonth: 420,
+    pricePerDay: 24,
     imageUrls: [
       'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800',
       'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800',
       'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800'
     ],
-    amenities: ['WiFi', 'Natural Light', 'Art Studios', 'Gallery Space', 'Darkroom'],
-    description: 'Inspiring loft space perfect for designers, artists, and creative professionals in trendy Brooklyn.'
+    amenities: ['WiFi', 'Natürliches Licht', 'Ateliers', 'Ausstellungsraum', 'Dunkelkammer'],
+    description: 'Inspirierender Loft-Raum perfekt für Designer, Künstler und Kreative in trendigem Berlin-Mitte.'
   },
   {
     id: 'space-8',
-    title: 'The Productive Space',
+    title: 'Produktivraum Hamburg',
     hostId: 'u2',
     type: 'Pro Workspace',
-    location: 'Chicago, IL',
-    pricePerMonth: 380,
-    pricePerDay: 22,
+    location: 'Hamburg Speicherstadt, Deutschland',
+    pricePerMonth: 360,
+    pricePerDay: 21,
     imageUrls: [
       'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800',
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800',
       'https://images.unsplash.com/photo-1497366412874-3415097a27e7?w=800'
     ],
-    amenities: ['WiFi', 'Standing Desks', 'Phone Booths', 'Wellness Room', 'Healthy Snacks'],
-    description: 'Focus-optimized workspace designed for maximum productivity with wellness-centered amenities.'
+    amenities: ['WiFi', 'Stehpulte', 'Telefonkabinen', 'Wellness Raum', 'Gesunde Snacks'],
+    description: 'Fokus-optimierter Arbeitsplatz für maximale Produktivität mit wellness-orientierten Annehmlichkeiten.'
   },
   {
     id: 'space-9',
-    title: 'Digital Nomad Hub',
+    title: 'Digital Nomad Hub Köln',
     hostId: 'u2',
     type: 'Pro Workspace',
-    location: 'Miami, FL',
-    pricePerMonth: 520,
-    pricePerDay: 28,
+    location: 'Köln Ehrenfeld, Deutschland',
+    pricePerMonth: 480,
+    pricePerDay: 26,
     imageUrls: [
       'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800',
       'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800',
       'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800'
     ],
-    amenities: ['WiFi', 'Ocean View', 'Travel Desk Support', '24/7 Access', 'Coworking Events'],
-    description: 'Beachside workspace perfect for remote workers and digital nomads with global community.'
+    amenities: ['WiFi', 'Rheinblick', 'Travel Desk Support', '24/7 Zugang', 'Coworking Events'],
+    description: 'Arbeitsplatz mit Rheinblick perfekt für Remote Worker und Digital Nomads mit globaler Community.'
   },
   {
     id: 'space-10',
-    title: 'Executive Suites Downtown',
+    title: 'Executive Suites Frankfurt',
     hostId: 'u2',
     type: 'Pro Workspace',
-    location: 'Los Angeles, CA',
-    pricePerMonth: 680,
-    pricePerDay: 38,
+    location: 'Frankfurt Westend, Deutschland',
+    pricePerMonth: 650,
+    pricePerDay: 36,
     imageUrls: [
       'https://images.unsplash.com/photo-1497366412874-3415097a27e7?w=800',
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800',
       'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800'
     ],
-    amenities: ['WiFi', 'Concierge Service', 'Private Offices', 'Business Lounge', 'Valet Parking'],
-    description: 'Professional executive workspace in downtown LA with premium business services and amenities.'
+    amenities: ['WiFi', 'Concierge Service', 'Private Büros', 'Business Lounge', 'Valet Parking'],
+    description: 'Professioneller Executive Arbeitsplatz in Frankfurt Westend mit Premium Business Services.'
   },
   {
     id: 'space-11',
-    title: 'Tech Valley Commons',
+    title: 'Tech Valley Dresden',
     hostId: 'u2',
     type: 'Pro Workspace',
-    location: 'Palo Alto, CA',
-    pricePerMonth: 590,
-    pricePerDay: 32,
+    location: 'Dresden Neustadt, Deutschland',
+    pricePerMonth: 520,
+    pricePerDay: 29,
     imageUrls: [
       'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800',
       'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800',
       'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800'
     ],
     amenities: ['WiFi', 'Venture Capital Network', 'Pitch Practice Rooms', 'Legal Clinic', 'Demo Days'],
-    description: 'Strategic workspace in Silicon Valley with connections to VCs, accelerators, and tech leaders.'
+    description: 'Strategischer Arbeitsplatz in Dresdens Silicon Saxony mit Verbindungen zu VCs und Tech-Leadern.'
   },
   {
     id: 'space-12',
-    title: 'Green Workspace',
+    title: 'Green Workspace Freiburg',
     hostId: 'u2',
     type: 'Pro Workspace',
-    location: 'Portland, OR',
-    pricePerMonth: 420,
-    pricePerDay: 24,
+    location: 'Freiburg Vauban, Deutschland',
+    pricePerMonth: 390,
+    pricePerDay: 22,
     imageUrls: [
       'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800',
       'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800',
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800'
     ],
-    amenities: ['WiFi', 'Living Walls', 'Organic Coffee', 'Bike Storage', 'Solar Powered', 'Composting'],
-    description: 'Eco-friendly workspace with sustainable practices and biophilic design in green Portland.'
+    amenities: ['WiFi', 'Grüne Wände', 'Bio-Kaffee', 'Fahrradstellplatz', 'Solar betrieben', 'Kompostierung'],
+    description: 'Umweltfreundlicher Arbeitsplatz mit nachhaltigen Praktiken und biophilem Design im grünen Freiburg.'
   },
 
   // BUDGET-FRIENDLY OPTIONS
   {
     id: 'space-13',
-    title: 'Startup Garage',
+    title: 'Startup Garage Leipzig',
     hostId: 'u2',
     type: 'Pro Workspace',
-    location: 'Detroit, MI',
-    pricePerMonth: 280,
-    pricePerDay: 18,
+    location: 'Leipzig Plagwitz, Deutschland',
+    pricePerMonth: 260,
+    pricePerDay: 16,
     imageUrls: [
       'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800',
       'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800',
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800'
     ],
-    amenities: ['WiFi', 'Maker Space', '3D Printers', 'Workshop Tools', 'Community Kitchen'],
-    description: 'Affordable maker space for entrepreneurs and creators in Detroit\'s innovation district.'
+    amenities: ['WiFi', 'Maker Space', '3D Drucker', 'Workshop Tools', 'Gemeinschaftsküche'],
+    description: 'Günstiger Maker Space für Unternehmer und Kreative in Leipzig Plagwitz.'
   },
   {
     id: 'space-14',
-    title: 'Student Union Co-work',
+    title: 'Student Co-Working Hannover',
     hostId: 'u2',
     type: 'Pro Workspace',
-    location: 'Nashville, TN',
-    pricePerMonth: 250,
-    pricePerDay: 15,
+    location: 'Hannover Linden, Deutschland',
+    pricePerMonth: 230,
+    pricePerDay: 14,
     imageUrls: [
       'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800',
       'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800',
       'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800'
     ],
-    amenities: ['WiFi', 'Study Groups', 'Tutoring', 'Gaming Area', 'Music Practice Rooms'],
-    description: 'Budget-friendly workspace near universities with young entrepreneur community and learning resources.'
+    amenities: ['WiFi', 'Lerngruppen', 'Nachhilfe', 'Gaming Bereich', 'Musikübungsräume'],
+    description: 'Günstiger Arbeitsplatz in Universitätsnähe mit junger Unternehmer-Community und Lernressourcen.'
   },
   {
     id: 'space-15',
-    title: 'Community Workshop',
+    title: 'Community Workshop Stuttgart',
     hostId: 'u2',
     type: 'Pro Workspace',
-    location: 'Phoenix, AZ',
-    pricePerMonth: 320,
-    pricePerDay: 20,
+    location: 'Stuttgart Ost, Deutschland',
+    pricePerMonth: 300,
+    pricePerDay: 18,
     imageUrls: [
       'https://images.unsplash.com/photo-1497366412874-3415097a27e7?w=800',
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800',
       'https://images.unsplash.com/photo-1497366216548-37526070297c?w=800'
     ],
     amenities: ['WiFi', 'Workshop Space', 'Tool Library', 'Community Events', 'Flexible Desks'],
-    description: 'Collaborative community space perfect for freelancers and small business owners on a budget.'
+    description: 'Kollaborativer Community-Raum perfekt für Freelancer und kleine Unternehmen mit Budget-Fokus.'
   }
 ];
 
@@ -429,13 +708,16 @@ export const bookingProducts: BookingProduct[] = [
   { spaceId: 'space-1', type: 'Day Pass', price: 45, quantity: 15, isAvailable: true, minDuration: '1 day' },
   { spaceId: 'space-1', type: 'Monthly Desk', price: 850, quantity: 8, isAvailable: true, minDuration: '1 month' },
   { spaceId: 'space-1', type: 'Private Office', price: 1200, quantity: 3, isAvailable: true, minDuration: '1 month' },
+  { spaceId: 'space-1', type: 'Team Room', price: 200, quantity: 2, isAvailable: true, minDuration: '1 day', teamSize: 8 },
   
   { spaceId: 'space-2', type: 'Day Pass', price: 40, quantity: 12, isAvailable: true, minDuration: '1 day' },
   { spaceId: 'space-2', type: 'Monthly Desk', price: 750, quantity: 10, isAvailable: true, minDuration: '1 month' },
+  { spaceId: 'space-2', type: 'Team Room', price: 180, quantity: 1, isAvailable: true, minDuration: '1 day', teamSize: 6 },
   
   { spaceId: 'space-3', type: 'Day Pass', price: 50, quantity: 10, isAvailable: true, minDuration: '1 day' },
   { spaceId: 'space-3', type: 'Monthly Desk', price: 950, quantity: 6, isAvailable: true, minDuration: '1 month' },
   { spaceId: 'space-3', type: 'Private Office', price: 1500, quantity: 2, isAvailable: true, minDuration: '1 month' },
+  { spaceId: 'space-3', type: 'Team Room', price: 250, quantity: 3, isAvailable: true, minDuration: '1 day', teamSize: 10 },
   
   { spaceId: 'space-4', type: 'Day Pass', price: 35, quantity: 20, isAvailable: true, minDuration: '1 day' },
   { spaceId: 'space-4', type: 'Monthly Desk', price: 650, quantity: 15, isAvailable: true, minDuration: '1 month' },
@@ -480,196 +762,22 @@ export const bookingProducts: BookingProduct[] = [
 
 // Comprehensive Reviews
 export const reviews: Review[] = [
-  { spaceId: 'space-1', userId: 'u3', rating: 5, comment: 'Amazing tech hub with incredible networking opportunities!' },
-  { spaceId: 'space-1', userId: 'u5', rating: 4, comment: 'Great facilities and very professional environment.' },
-  { spaceId: 'space-2', userId: 'u3', rating: 5, comment: 'Microsoft Reactor is fantastic for learning and growth.' },
-  { spaceId: 'space-3', userId: 'u3', rating: 5, comment: 'Google workspace exceeded all expectations!' },
-  { spaceId: 'space-4', userId: 'u5', rating: 4, comment: 'Austin vibe is perfect for startup culture.' },
-  { spaceId: 'space-5', userId: 'u3', rating: 4, comment: 'Salesforce training opportunities are invaluable.' },
-  { spaceId: 'space-6', userId: 'u5', rating: 5, comment: 'AI lab access is a game changer for my projects.' },
-  { spaceId: 'space-7', userId: 'u3', rating: 5, comment: 'Brooklyn loft has such inspiring creative energy!' },
-  { spaceId: 'space-8', userId: 'u5', rating: 4, comment: 'Perfect for focused work with great wellness amenities.' },
-  { spaceId: 'space-9', userId: 'u3', rating: 5, comment: 'Ocean view makes remote work feel like vacation!' },
-  { spaceId: 'space-10', userId: 'u5', rating: 4, comment: 'Executive suites are perfect for client meetings.' },
-  { spaceId: 'space-11', userId: 'u3', rating: 5, comment: 'VC connections helped scale my startup!' },
-  { spaceId: 'space-12', userId: 'u5', rating: 4, comment: 'Love the eco-friendly approach and bike storage.' },
-  { spaceId: 'space-13', userId: 'u3', rating: 4, comment: 'Great value for money with amazing maker space!' },
-  { spaceId: 'space-14', userId: 'u5', rating: 3, comment: 'Perfect for students and young entrepreneurs.' },
-  { spaceId: 'space-15', userId: 'u3', rating: 4, comment: 'Community workshop has great collaborative spirit.' }
-];
-
-// Corporate Benefits Program Data
-export const companies: Company[] = [
-  {
-    id: 'company-1',
-    name: 'TechCorp Solutions',
-    domain: 'techcorp.com',
-    logo: '/logos/techcorp.png',
-    subscriptionPlan: 'EnterpriseFlex',
-    monthlyCredits: 10000,
-    usedCredits: 3240,
-    employeeCount: 250,
-    adminUserId: 'u-corp-admin-1',
-    settings: {
-      autoApproveBookings: true,
-      maxBookingDuration: 30,
-      allowedCategories: ['Day Pass', 'Monthly Desk', 'Private Office'],
-      budgetAlerts: true
-    },
-    isActive: true,
-    joinedDate: '2024-01-15'
-  },
-  {
-    id: 'company-2',
-    name: 'StartupX',
-    domain: 'startupx.io',
-    logo: '/logos/startupx.png',
-    subscriptionPlan: 'StartupFlex',
-    monthlyCredits: 500,
-    usedCredits: 180,
-    employeeCount: 12,
-    adminUserId: 'u-corp-admin-2',
-    settings: {
-      autoApproveBookings: false,
-      maxBookingDuration: 14,
-      allowedCategories: ['Day Pass', 'Monthly Desk'],
-      budgetAlerts: true
-    },
-    isActive: true,
-    joinedDate: '2024-03-01'
-  },
-  {
-    id: 'company-3',
-    name: 'ScaleUp Inc',
-    domain: 'scaleup.com',
-    logo: '/logos/scaleup.png',
-    subscriptionPlan: 'ScaleFlex',
-    monthlyCredits: 2000,
-    usedCredits: 756,
-    employeeCount: 85,
-    adminUserId: 'u-corp-admin-3',
-    settings: {
-      autoApproveBookings: true,
-      maxBookingDuration: 21,
-      allowedCategories: ['Day Pass', 'Monthly Desk'],
-      budgetAlerts: false
-    },
-    isActive: true,
-    joinedDate: '2024-02-10'
-  }
-];
-
-export const corporateUsers: User[] = [
-  {
-    id: 'u-corp-admin-1',
-    name: 'Sarah Johnson',
-    email: 'sarah.johnson@techcorp.com',
-    role: 'corporate-admin',
-    profileImageUrl: '/profile/sarah.jpg',
-    company: 'TechCorp Solutions',
-    title: 'VP of Operations',
-    bio: 'Ensuring our distributed team has access to world-class workspaces everywhere.'
-  },
-  {
-    id: 'u-corp-emp-1',
-    name: 'Michael Chen',
-    email: 'michael.chen@techcorp.com',
-    role: 'corporate-employee',
-    profileImageUrl: '/profile/michael.jpg',
-    company: 'TechCorp Solutions',
-    title: 'Senior Software Engineer',
-    bio: 'Digital nomad developer working from amazing spaces around the world.'
-  },
-  {
-    id: 'u-corp-emp-2',
-    name: 'Emma Rodriguez',
-    email: 'emma.rodriguez@techcorp.com',
-    role: 'corporate-employee',
-    profileImageUrl: '/profile/emma.jpg',
-    company: 'TechCorp Solutions',
-    title: 'Product Manager',
-    bio: 'Building products while exploring new cities and workspaces.'
-  },
-  {
-    id: 'u-corp-admin-2',
-    name: 'David Park',
-    email: 'david@startupx.io',
-    role: 'corporate-admin',
-    profileImageUrl: '/profile/david.jpg',
-    company: 'StartupX',
-    title: 'Co-Founder & CEO',
-    bio: 'Building a global remote-first startup culture.'
-  },
-  {
-    id: 'u-corp-emp-3',
-    name: 'Lisa Wang',
-    email: 'lisa@startupx.io',
-    role: 'corporate-employee',
-    profileImageUrl: '/profile/lisa.jpg',
-    company: 'StartupX',
-    title: 'Lead Designer',
-    bio: 'Creating beautiful experiences while working from inspiring spaces.'
-  }
-];
-
-export const employeeBookings: EmployeeBooking[] = [
-  {
-    id: 'booking-1',
-    employeeId: 'u-corp-emp-1',
-    companyId: 'company-1',
-    spaceId: 'space-1',
-    bookingType: 'Monthly Desk',
-    startDate: '2024-07-01',
-    endDate: '2024-07-31',
-    creditsUsed: 850,
-    status: 'active',
-    approvedBy: 'u-corp-admin-1'
-  },
-  {
-    id: 'booking-2',
-    employeeId: 'u-corp-emp-2',
-    companyId: 'company-1',
-    spaceId: 'space-3',
-    bookingType: 'Day Pass',
-    startDate: '2024-07-15',
-    endDate: '2024-07-19',
-    creditsUsed: 250,
-    status: 'completed'
-  },
-  {
-    id: 'booking-3',
-    employeeId: 'u-corp-emp-3',
-    companyId: 'company-2',
-    spaceId: 'space-7',
-    bookingType: 'Day Pass',
-    startDate: '2024-07-20',
-    endDate: '2024-07-20',
-    creditsUsed: 35,
-    status: 'pending'
-  }
-];
-
-export const corporateMetrics: CorporateDashboardMetrics[] = [
-  {
-    companyId: 'company-1',
-    month: '2024-07',
-    totalBookings: 45,
-    activeEmployees: 32,
-    creditsUsed: 3240,
-    costSavings: 85000,
-    popularLocations: ['San Francisco', 'New York', 'Austin'],
-    employeeSatisfaction: 4.8
-  },
-  {
-    companyId: 'company-2',
-    month: '2024-07',
-    totalBookings: 8,
-    activeEmployees: 6,
-    creditsUsed: 180,
-    costSavings: 12000,
-    popularLocations: ['Brooklyn', 'Austin'],
-    employeeSatisfaction: 4.6
-  }
+  { spaceId: 'space-1', userId: 'u3', rating: 5, comment: 'Fantastisches Tech-Hub mit unglaublichen Networking-Möglichkeiten!' },
+  { spaceId: 'space-1', userId: 'u5', rating: 4, comment: 'Tolle Einrichtungen und sehr professionelle Atmosphäre.' },
+  { spaceId: 'space-2', userId: 'u3', rating: 5, comment: 'Rocket Internet Campus ist fantastisch für Lernen und Wachstum.' },
+  { spaceId: 'space-3', userId: 'u3', rating: 5, comment: 'Siemens Digital Factory hat alle Erwartungen übertroffen!' },
+  { spaceId: 'space-4', userId: 'u5', rating: 4, comment: 'Berlin Vibe ist perfekt für Fintech-Startup-Kultur.' },
+  { spaceId: 'space-5', userId: 'u3', rating: 4, comment: 'Delivery Hero Trainingsmöglichkeiten sind unbezahlbar.' },
+  { spaceId: 'space-6', userId: 'u5', rating: 5, comment: 'AutoScout24 Lab-Zugang ist ein Game Changer für meine Projekte.' },
+  { spaceId: 'space-7', userId: 'u3', rating: 5, comment: 'Hackescher Markt Loft hat so inspirierende kreative Energie!' },
+  { spaceId: 'space-8', userId: 'u5', rating: 4, comment: 'Perfekt für fokussiertes Arbeiten mit tollen Wellness-Angeboten.' },
+  { spaceId: 'space-9', userId: 'u3', rating: 5, comment: 'Rheinblick macht Remote Work wie Urlaub!' },
+  { spaceId: 'space-10', userId: 'u5', rating: 4, comment: 'Executive Suites sind perfekt für Kundentermine.' },
+  { spaceId: 'space-11', userId: 'u3', rating: 5, comment: 'VC-Verbindungen haben geholfen, mein Startup zu skalieren!' },
+  { spaceId: 'space-12', userId: 'u5', rating: 4, comment: 'Liebe den umweltfreundlichen Ansatz und Fahrradstellplätze.' },
+  { spaceId: 'space-13', userId: 'u3', rating: 4, comment: 'Tolles Preis-Leistungs-Verhältnis mit fantastischem Maker Space!' },
+  { spaceId: 'space-14', userId: 'u5', rating: 3, comment: 'Perfekt für Studenten und junge Unternehmer.' },
+  { spaceId: 'space-15', userId: 'u3', rating: 4, comment: 'Community Workshop hat tollen kollaborativen Geist.' }
 ];
 
 // Dummy Matches for Carol (u3)
@@ -731,4 +839,119 @@ export const getAvailableBookingTypes = (spaceId: string) => {
       price: bp.price,
       minDuration: bp.minDuration
     }));
+};
+
+// Corporate Team Bookings
+export const corporateBookings: CorporateBooking[] = [
+  {
+    id: 'booking-1',
+    spaceId: 'space-1',
+    teamLeadId: 'u10',
+    teamMembers: ['u10', 'u8', 'u9'], // Jack (TechCorp), Henry (InnovateLabs), Iris (Freelancer)
+    billingType: 'mixed',
+    coordinationDetails: {
+      startDate: '2025-07-25',
+      endDate: '2025-07-27',
+      purpose: 'Cross-company collaboration sprint',
+      notes: 'Joint project between TechCorp and InnovateLabs with external UX consultant'
+    },
+    corporateCoverage: {
+      companyId: 'comp-1',
+      coveredMembers: ['u10'],
+      totalCost: 600,
+      companyCoveredAmount: 200
+    }
+  },
+  {
+    id: 'booking-2',
+    spaceId: 'space-3',
+    teamLeadId: 'u3',
+    teamMembers: ['u3', 'u8'],
+    billingType: 'corporate',
+    coordinationDetails: {
+      startDate: '2025-08-01',
+      endDate: '2025-08-03',
+      purpose: 'StartupX team offsite planning session',
+      notes: 'Strategic planning and team building activities'
+    },
+    corporateCoverage: {
+      companyId: 'comp-2',
+      coveredMembers: ['u3'],
+      totalCost: 500,
+      companyCoveredAmount: 250
+    }
+  }
+];
+
+// Helper Functions for Corporate Features
+export const getCompanyByDomain = (email: string): Company | null => {
+  const domain = email.split('@')[1];
+  return companies.find(company => company.domain === domain) || null;
+};
+
+// Popular search suggestions for homepage
+export const popularSearches = [
+  'Corporate Hubs in Berlin',
+  'Pro Workspaces in München', 
+  'Monthly Desks in Hamburg',
+  'Day Pass in Frankfurt',
+  'Private Offices in Köln'
+];
+
+// Trusted company logos for homepage
+export const trustedCompanies = [
+  'SAP',
+  'Siemens', 
+  'Deutsche Bank',
+  'Rocket Internet'
+];
+
+// Demo account information for AuthModal
+export const demoAccounts = [
+  { email: 'alice@sap.com', role: 'Corporate Host' },
+  { email: 'bob@provider.com', role: 'Pro Provider' },
+  { email: 'carol@berlinstartup.de', role: 'Corporate Employee' },
+  { email: 'dave@sysadmin.com', role: 'Platform Admin' },
+  { email: 'frank@sap.com', role: 'Corporate Admin' },
+  { email: 'grace@db.com', role: 'Corporate Executive' },
+  { email: 'henry@rocket-internet.com', role: 'Corporate Employee' },
+  { email: 'iris@freelancer.com', role: 'Independent Member' }
+];
+
+// Corporate statistics for homepage
+export const corporateStats = {
+  partnerCompanies: '250+',
+  teamBookings: '800K+', 
+  costSavings: '78%',
+  globalCities: '25+'
+};
+
+export const getUserCorporateBenefits = (userId: string) => {
+  const user = users.find(u => u.id === userId);
+  return user?.corporateBenefits || null;
+};
+
+export const getCompanyById = (companyId: string): Company | null => {
+  return companies.find(company => company.id === companyId) || null;
+};
+
+export const isUserCorporateEmployee = (userId: string): boolean => {
+  const user = users.find(u => u.id === userId);
+  return user?.role === 'corporate-employee' || user?.role === 'corporate-admin' || user?.role === 'corporate-executive';
+};
+
+export const getTeamBookingsByUser = (userId: string): CorporateBooking[] => {
+  return corporateBookings.filter(booking => 
+    booking.teamLeadId === userId || booking.teamMembers.includes(userId)
+  );
+};
+
+export const getSpaceTeamCapacity = (spaceId: string): number => {
+  const space = spaces.find(s => s.id === spaceId);
+  return space?.teamCapacity || 1;
+};
+
+export const hasHostBenefits = (spaceId: string): boolean => {
+  const space = spaces.find(s => s.id === spaceId);
+  return space?.corporateHostBenefits?.crossBenefitsAvailable || false;
 };
