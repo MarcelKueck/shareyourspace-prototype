@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import Image from 'next/image';
 import { Star, MapPin, Wifi, Coffee, Phone, Calendar, Users as UsersIcon, ChevronLeft, ChevronRight } from 'lucide-react';
 import { spaces, users, reviews, bookingProducts } from '../../lib/dummy-data';
-import BookingWidget from '../../components/ui/BookingWidget';
+import BookingWidget from '../../components/ui/EnhancedBookingWidget';
 
 interface PageProps {
   params: Promise<{

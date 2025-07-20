@@ -33,7 +33,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen" onClick={closeDropdowns}>
       {/* Hero Section */}
-      <section className="relative h-[90vh] min-h-[700px] flex items-center justify-center overflow-hidden">
+      <section className="relative h-screen min-h-[800px] flex items-center justify-center overflow-hidden">
         {/* Professional Background Image - Modern Office */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -187,83 +187,191 @@ export default function HomePage() {
                     </div>
                   </div>
                   
-                  {/* Custom Booking Dropdown */}
+                  {/* Enhanced Booking Dropdown with Custom Durations */}
                   {showBookingDropdown && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[9999] animate-fade-in-up">
-                      <div 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setBookingType('Day Pass');
-                          setShowBookingDropdown(false);
-                        }}
-                        className="p-4 hover:bg-green-50 transition-colors duration-200 border-b border-gray-100 cursor-pointer"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-3 h-3 bg-green-500 rounded-full flex-shrink-0"></div>
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[9999] animate-fade-in-up max-w-md">
+                      <div className="p-4 border-b border-gray-100">
+                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Choose Your Workspace Plan</h3>
+                        <p className="text-sm text-gray-600">Flexible options for any duration</p>
+                      </div>
+                      
+                      {/* Hourly Options */}
+                      <div className="p-4 border-b border-gray-100">
+                        <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                          <div className="w-3 h-3 bg-emerald-500 rounded-full mr-2"></div>
+                          Hourly Access
+                        </h4>
+                        <div className="space-y-2">
+                          <div 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setBookingType('2 Hours');
+                              setShowBookingDropdown(false);
+                            }}
+                            className="flex justify-between items-center p-3 hover:bg-emerald-50 rounded-lg cursor-pointer transition-colors"
+                          >
                             <div>
-                              <h4 className="font-bold text-gray-900">Day Pass</h4>
-                              <p className="text-xs text-gray-600">Try spaces & short projects</p>
+                              <span className="font-medium text-gray-900">Quick Session</span>
+                              <p className="text-xs text-gray-600">2-4 hours</p>
                             </div>
+                            <span className="text-sm font-semibold text-emerald-600">€8-16</span>
                           </div>
-                          <span className="text-sm font-semibold text-green-600">From $25</span>
+                          <div 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setBookingType('Half Day');
+                              setShowBookingDropdown(false);
+                            }}
+                            className="flex justify-between items-center p-3 hover:bg-emerald-50 rounded-lg cursor-pointer transition-colors"
+                          >
+                            <div>
+                              <span className="font-medium text-gray-900">Half Day</span>
+                              <p className="text-xs text-gray-600">4-6 hours</p>
+                            </div>
+                            <span className="text-sm font-semibold text-emerald-600">€16-24</span>
+                          </div>
+                          <div 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setBookingType('Full Day');
+                              setShowBookingDropdown(false);
+                            }}
+                            className="flex justify-between items-center p-3 hover:bg-emerald-50 rounded-lg cursor-pointer transition-colors"
+                          >
+                            <div>
+                              <span className="font-medium text-gray-900">Full Day</span>
+                              <p className="text-xs text-gray-600">8+ hours</p>
+                            </div>
+                            <span className="text-sm font-semibold text-emerald-600">€25</span>
+                          </div>
                         </div>
                       </div>
-                      <div 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setBookingType('Monthly Desk');
-                          setShowBookingDropdown(false);
-                        }}
-                        className="p-4 hover:bg-blue-50 transition-colors duration-200 border-b border-gray-100 cursor-pointer"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
+
+                      {/* Multi-Day Options */}
+                      <div className="p-4 border-b border-gray-100">
+                        <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                          <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
+                          Multi-Day Access
+                        </h4>
+                        <div className="space-y-2">
+                          <div 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setBookingType('Week Pass');
+                              setShowBookingDropdown(false);
+                            }}
+                            className="flex justify-between items-center p-3 hover:bg-green-50 rounded-lg cursor-pointer transition-colors"
+                          >
                             <div>
-                              <h4 className="font-bold text-gray-900">Monthly Desk</h4>
-                              <p className="text-xs text-gray-600">Dedicated desk with storage</p>
+                              <span className="font-medium text-gray-900">Week Pass</span>
+                              <p className="text-xs text-gray-600">5-7 days</p>
                             </div>
+                            <span className="text-sm font-semibold text-green-600">€110-140</span>
                           </div>
-                          <span className="text-sm font-semibold text-blue-600">From $200</span>
+                          <div 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setBookingType('Custom Days');
+                              setShowBookingDropdown(false);
+                            }}
+                            className="flex justify-between items-center p-3 hover:bg-green-50 rounded-lg cursor-pointer transition-colors"
+                          >
+                            <div>
+                              <span className="font-medium text-gray-900">Custom Period</span>
+                              <p className="text-xs text-gray-600">Choose your dates</p>
+                            </div>
+                            <span className="text-sm font-semibold text-green-600">€25/day</span>
+                          </div>
                         </div>
                       </div>
-                      <div 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setBookingType('Private Office');
-                          setShowBookingDropdown(false);
-                        }}
-                        className="p-4 hover:bg-purple-50 transition-colors duration-200 border-b border-gray-100 cursor-pointer"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-3 h-3 bg-purple-500 rounded-full flex-shrink-0"></div>
+
+                      {/* Monthly & Long-term Options */}
+                      <div className="p-4 border-b border-gray-100">
+                        <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                          <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
+                          Monthly & Long-term
+                        </h4>
+                        <div className="space-y-2">
+                          <div 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setBookingType('1 Month');
+                              setShowBookingDropdown(false);
+                            }}
+                            className="flex justify-between items-center p-3 hover:bg-blue-50 rounded-lg cursor-pointer transition-colors"
+                          >
                             <div>
-                              <h4 className="font-bold text-gray-900">Private Office</h4>
-                              <p className="text-xs text-gray-600">Enclosed space for teams</p>
+                              <span className="font-medium text-gray-900">Monthly Desk</span>
+                              <p className="text-xs text-gray-600">30 days, dedicated space</p>
                             </div>
+                            <span className="text-sm font-semibold text-blue-600">€200</span>
                           </div>
-                          <span className="text-sm font-semibold text-purple-600">From $800</span>
+                          <div 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setBookingType('3 Months');
+                              setShowBookingDropdown(false);
+                            }}
+                            className="flex justify-between items-center p-3 hover:bg-blue-50 rounded-lg cursor-pointer transition-colors"
+                          >
+                            <div>
+                              <span className="font-medium text-gray-900">Quarterly</span>
+                              <p className="text-xs text-gray-600">3 months, 15% savings</p>
+                            </div>
+                            <span className="text-sm font-semibold text-blue-600">€510</span>
+                          </div>
+                          <div 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setBookingType('6+ Months');
+                              setShowBookingDropdown(false);
+                            }}
+                            className="flex justify-between items-center p-3 hover:bg-blue-50 rounded-lg cursor-pointer transition-colors"
+                          >
+                            <div>
+                              <span className="font-medium text-gray-900">Long-term</span>
+                              <p className="text-xs text-gray-600">6+ months, best rates</p>
+                            </div>
+                            <span className="text-sm font-semibold text-blue-600">From €170/mo</span>
+                          </div>
                         </div>
                       </div>
-                      <div 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setBookingType('Team Room');
-                          setShowBookingDropdown(false);
-                        }}
-                        className="p-4 hover:bg-indigo-50 transition-colors duration-200 cursor-pointer"
-                      >
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-3">
-                            <div className="w-3 h-3 bg-indigo-500 rounded-full flex-shrink-0"></div>
+
+                      {/* Team Options */}
+                      <div className="p-4">
+                        <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
+                          <div className="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
+                          Team Solutions
+                        </h4>
+                        <div className="space-y-2">
+                          <div 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setBookingType('Meeting Room');
+                              setShowBookingDropdown(false);
+                            }}
+                            className="flex justify-between items-center p-3 hover:bg-purple-50 rounded-lg cursor-pointer transition-colors"
+                          >
                             <div>
-                              <h4 className="font-bold text-gray-900">Team Room</h4>
-                              <p className="text-xs text-gray-600">Collaborative space for groups</p>
+                              <span className="font-medium text-gray-900">Meeting Room</span>
+                              <p className="text-xs text-gray-600">2-8 people, hourly</p>
                             </div>
+                            <span className="text-sm font-semibold text-purple-600">€50/hr</span>
                           </div>
-                          <span className="text-sm font-semibold text-indigo-600">From $50/hr</span>
+                          <div 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setBookingType('Private Office');
+                              setShowBookingDropdown(false);
+                            }}
+                            className="flex justify-between items-center p-3 hover:bg-purple-50 rounded-lg cursor-pointer transition-colors"
+                          >
+                            <div>
+                              <span className="font-medium text-gray-900">Private Office</span>
+                              <p className="text-xs text-gray-600">2-12 people, monthly</p>
+                            </div>
+                            <span className="text-sm font-semibold text-purple-600">€800/mo</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -298,8 +406,8 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Dynamic Target Group Solutions Section */}
-      <section className="py-24 bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+      {/* Dynamic Target Group Solutions Section - Full Viewport Scaling */}
+      <section className="h-screen min-h-[800px] flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
         {/* Background Pattern */}
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-full h-full" style={{
@@ -307,7 +415,9 @@ export default function HomePage() {
           }}></div>
         </div>
         
-        <TargetGroupCarousel />
+        <div className="w-full h-full overflow-hidden">
+          <TargetGroupCarousel />
+        </div>
       </section>
 
       {/* Discovery Sections */}
@@ -316,6 +426,16 @@ export default function HomePage() {
         <DiscoverySection 
           title="Featured Workspaces" 
           spaces={featuredSpaces} 
+        />
+        
+        {/* Hourly Passes */}
+        <DiscoverySection 
+          title="Perfect for Hourly Work" 
+          spaces={spaces.filter(space => 
+            bookingProducts.some(bp => 
+              bp.spaceId === space.id && bp.type === 'Hourly Pass'
+            )
+          ).slice(0, 8)} 
         />
         
         {/* Day Pass Friendly */}

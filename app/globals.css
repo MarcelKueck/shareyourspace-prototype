@@ -5,13 +5,6 @@
   --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
@@ -19,10 +12,28 @@
   }
 }
 
+/* Responsive viewport handling */
+html {
+  scroll-behavior: smooth;
+  /* Prevent horizontal overflow */
+  overflow-x: hidden;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  /* Prevent horizontal overflow */
+  overflow-x: hidden;
+}
+
+/* Mobile viewport handling */
+@media (max-width: 640px) {
+  /* Ensure mobile viewport is handled correctly */
+  .min-h-screen {
+    min-height: 100vh;
+    min-height: 100svh; /* Use small viewport height on mobile */
+  }
 }
 
 /* Custom animations */
@@ -47,4 +58,27 @@ body {
 
 .delay-300 {
   animation-delay: 0.3s;
+}
+
+/* Text truncation utilities */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Prevent horizontal scrolling and overflow */
+.no-overflow {
+  overflow-x: hidden;
+  max-width: 100%;
 }
