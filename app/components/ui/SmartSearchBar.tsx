@@ -217,6 +217,20 @@ export default function SmartSearchBar({ onSearch, mode = 'flexible', showFilter
     return () => document.removeEventListener('mousedown', handleClick);
   }, [showGuestPicker]);
 
+  // Add ref for duration picker
+  const durationPickerRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (durationPickerRef.current && !durationPickerRef.current.contains(e.target as Node)) {
+        setShowDurationPicker(false);
+      }
+    }
+    if (showDurationPicker) {
+      document.addEventListener('mousedown', handleClick);
+    }
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, [showDurationPicker]);
+
   // --- Filtering logic ---
   const filterSpaces = () => {
     let filtered = allSpaces;
@@ -421,62 +435,88 @@ export default function SmartSearchBar({ onSearch, mode = 'flexible', showFilter
               ) : (
                 <>
                   {/* Start Date for contracts */}
-                  <div className="p-4 hover:bg-gray-50 transition-colors cursor-pointer">
-                    <div className="flex items-center space-x-3">
-                      <Calendar className="w-5 h-5 text-gray-400" />
-                      <div className="flex-1">
-                        <label className="block text-xs font-semibold text-gray-700 mb-1">
-                          Start date
-                        </label>
-                        <input
-                          type="date"
-                          value={startDate}
-                          onChange={(e) => setStartDate(e.target.value)}
-                          min={new Date().toISOString().split('T')[0]}
-                          className="w-full text-sm text-gray-900 bg-transparent border-none outline-none"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Contract Duration */}
-                  <div className="relative p-4 hover:bg-gray-50 transition-colors cursor-pointer">
-                    <div 
-                      className="flex items-center space-x-3 cursor-pointer"
-                      onClick={() => setShowDurationPicker(!showDurationPicker)}
+                  <div className="flex items-stretch min-w-0 w-full">
+                    <div
+                      className={`flex-1 p-4 transition-colors cursor-pointer relative z-10 ${activeField === 'checkin' ? 'ring-2 ring-rose-400 bg-rose-50' : 'hover:bg-gray-50'}`}
+                      onClick={() => {
+                        setShowExtendedFilters(false);
+                        setActiveField('checkin');
+                        setShowCalendar(true);
+                      }}
+                      style={{ minWidth: 0 }}
                     >
-                      <Clock className="w-5 h-5 text-gray-400" />
-                      <div className="flex-1">
-                        <label className="block text-xs font-semibold text-gray-700 mb-1">
-                          Duration
-                        </label>
-                        <span className="text-sm text-gray-900">
-                          {contractDurationOptions.find(opt => opt.value === contractDuration)?.label}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Duration picker dropdown */}
-                    {showDurationPicker && (
-                      <div className="absolute top-full left-0 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-20 w-48">
-                        <div className="p-2">
-                          {contractDurationOptions.map((option) => (
-                            <button
-                              key={option.value}
-                              onClick={() => {
-                                setContractDuration(option.value);
-                                setShowDurationPicker(false);
-                              }}
-                              className={`w-full text-left p-3 rounded hover:bg-gray-50 text-sm transition-colors ${
-                                contractDuration === option.value ? 'bg-blue-50 text-blue-700' : ''
-                              }`}
-                            >
-                              {option.label}
-                            </button>
-                          ))}
+                      <div className="flex items-center space-x-3 cursor-pointer">
+                        <Calendar className="w-5 h-5 text-gray-400" />
+                        <div className="flex-1 min-w-0">
+                          <label className="block text-xs font-semibold text-gray-700 mb-1">Start date</label>
+                          <span className="text-sm text-gray-900 truncate block">
+                            {startDate ? new Date(startDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'Add date'}
+                          </span>
                         </div>
                       </div>
-                    )}
+                      {/* Calendar Popout for contract start date */}
+                      {typeof window !== 'undefined' && showCalendar && activeField === 'checkin' && (
+                        <CalendarPopout
+                          show={showCalendar}
+                          onClose={() => setShowCalendar(false)}
+                          checkIn={startDate}
+                          checkOut={startDate}
+                          selectingField="checkin"
+                          onSelectRange={(start) => {
+                            setStartDate(start);
+                            setActiveField(null);
+                            setShowCalendar(false);
+                          }}
+                          onSelectCheckIn={(start) => {
+                            setStartDate(start);
+                            setActiveField(null);
+                            setShowCalendar(false);
+                          }}
+                        />
+                      )}
+                    </div>
+                    {/* Separator */}
+                    <div className="w-px bg-gray-200 mx-0.5 self-stretch" />
+                    {/* Contract Duration */}
+                    <div ref={durationPickerRef} className="flex-1 relative p-4 hover:bg-gray-50 transition-colors cursor-pointer min-w-0">
+                      <div 
+                        className="flex items-center space-x-3 cursor-pointer"
+                        onClick={() => setShowDurationPicker(!showDurationPicker)}
+                      >
+                        <Clock className="w-5 h-5 text-gray-400" />
+                        <div className="flex-1 min-w-0">
+                          <label className="block text-xs font-semibold text-gray-700 mb-1">
+                            Duration
+                          </label>
+                          <span className="text-sm text-gray-900 truncate block">
+                            {contractDurationOptions.find(opt => opt.value === contractDuration)?.label}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Duration picker dropdown - Airbnb/Calendar style */}
+                      {showDurationPicker && (
+                        <div className="absolute top-full left-0 mt-2 bg-white border border-gray-200 rounded-2xl shadow-2xl z-30 w-64 min-w-max animate-fade-in" style={{ fontFamily: 'inherit' }}>
+                          <div className="flex flex-col py-2">
+                            {contractDurationOptions.map((option) => (
+                              <button
+                                key={option.value}
+                                onClick={() => {
+                                  setContractDuration(option.value);
+                                  setShowDurationPicker(false);
+                                }}
+                                className={`w-full text-left px-5 py-3 rounded-xl transition-colors text-base font-semibold
+                                  ${contractDuration === option.value ? 'bg-rose-100 text-rose-700' : 'text-gray-900 hover:bg-gray-100'}
+                                `}
+                                style={{ fontFamily: 'inherit', boxShadow: 'none', outline: 'none', border: 'none', background: 'none' }}
+                              >
+                                {option.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </>
               )}
@@ -571,7 +611,11 @@ export default function SmartSearchBar({ onSearch, mode = 'flexible', showFilter
       {/* Fancy Extended Filters Panel - Airbnb inspired */}
       {showExtendedFilters && (
         <div className="fixed left-0 right-0 top-0 bottom-0 z-40 pointer-events-none">
-          <div className="absolute left-1/2 top-24 -translate-x-1/2 z-50 bg-white rounded-3xl shadow-2xl w-full max-w-2xl mx-auto p-8 animate-fade-in pointer-events-auto">
+          <div
+            className="absolute left-1/2 top-24 -translate-x-1/2 z-50 bg-white rounded-3xl shadow-2xl w-full max-w-2xl mx-auto p-8 animate-fade-in pointer-events-auto overflow-y-auto"
+            style={{ maxHeight: 'calc(100vh - 6rem)' }}
+            onWheel={e => e.stopPropagation()}
+          >
             <button
               className="absolute top-4 right-4 text-gray-400 hover:text-gray-700 text-2xl font-bold focus:outline-none"
               onClick={() => setShowExtendedFilters(false)}
@@ -717,6 +761,9 @@ const CalendarPopout: React.FC<CalendarPopoutProps> = ({ show, onClose, checkIn,
   const [selecting, setSelecting] = useState<'checkin' | 'checkout'>(selectingField);
   const [hoveredDate, setHoveredDate] = useState<string | null>(null);
 
+  // Determine if single-date mode (contract) or range mode (flexible)
+  const isSingleDateMode = checkIn === checkOut;
+
   // Update selecting when prop changes
   useEffect(() => {
     setSelecting(selectingField);
@@ -742,6 +789,48 @@ const CalendarPopout: React.FC<CalendarPopoutProps> = ({ show, onClose, checkIn,
     days.push(`${year}-${pad(month + 1)}-${pad(d)}`);
   }
 
+  // --- Single-date mode (contract) ---
+  if (isSingleDateMode) {
+    // Only one circle, no range, no hover highlight
+    const isSelected = (date: string) => date === checkIn;
+    const isPast = (date: string) => {
+      const dateObj = new Date(date);
+      return dateObj < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    };
+    return (
+      <div id="calendar-popout" className="absolute left-1/2 -translate-x-1/2 top-full mt-2 bg-white border border-gray-200 rounded-2xl shadow-2xl z-30 w-[420px] p-6 animate-fade-in" style={{ minWidth: 320 }}>
+        <div className="flex items-center justify-between mb-4">
+          <button onClick={() => setMonth(month === 0 ? 11 : month - 1)} className="p-2 rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-rose-400 text-gray-800 font-bold text-lg">&#8592;</button>
+          <div className="font-bold text-xl text-gray-900 drop-shadow-sm">{new Date(year, month).toLocaleString(undefined, { month: 'long' })} {year}</div>
+          <button onClick={() => setMonth(month === 11 ? 0 : month + 1)} className="p-2 rounded hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-rose-400 text-gray-800 font-bold text-lg">&#8594;</button>
+        </div>
+        <div className="grid grid-cols-7 gap-1 mb-2 text-xs text-gray-600 font-semibold">
+          {['S','M','T','W','T','F','S'].map((d, i) => <div key={d + i} className="text-center">{d}</div>)}
+        </div>
+        <div className="grid grid-cols-7 gap-1">
+          {days.map((date, idx) => date ? (
+            <button
+              key={date}
+              onClick={() => !isPast(date) && onSelectCheckIn(date)}
+              className={`aspect-square w-9 rounded-full text-sm font-medium transition-all duration-100
+                ${isPast(date) ? 'text-gray-400 line-through cursor-not-allowed bg-gray-50' :
+                  isSelected(date) ? 'bg-rose-500 text-white shadow-lg ring-2 ring-rose-400' :
+                  'text-gray-900 hover:bg-rose-50 hover:ring-2 hover:ring-rose-300'}
+              `}
+              disabled={isPast(date)}
+            >
+              {Number(date.split('-')[2])}
+            </button>
+          ) : <div key={idx} />)}
+        </div>
+        <div className="flex justify-between items-center mt-4">
+          <button onClick={onClose} className="text-gray-700 hover:underline text-base font-semibold px-3 py-1 rounded focus:outline-none focus:ring-2 focus:ring-rose-400">Cancel</button>
+        </div>
+      </div>
+    );
+  }
+
+  // --- Range mode (flexible) ---
   // Range highlight logic
   const isInRange = (date: string) => {
     if (selecting === 'checkout' && checkIn && hoveredDate && hoveredDate > checkIn) {
