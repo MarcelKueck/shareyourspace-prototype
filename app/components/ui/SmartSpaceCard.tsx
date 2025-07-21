@@ -1,7 +1,7 @@
 'use client';
 
 import { Heart, CheckCircle, Users, Shield, Award } from 'lucide-react';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -13,7 +13,7 @@ interface SmartSpaceCardProps {
   showContracts?: boolean;
 }
 
-export default function SmartSpaceCard({ space, showContracts = false }: SmartSpaceCardProps) {
+function SmartSpaceCardInner({ space, showContracts = false }: SmartSpaceCardProps) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const { currentUser, corporateAllowance } = useAuthStore();
   const searchParams = useSearchParams();
@@ -196,5 +196,13 @@ export default function SmartSpaceCard({ space, showContracts = false }: SmartSp
         </div>
       </div>
     </Link>
+  );
+}
+
+export default function SmartSpaceCard(props: SmartSpaceCardProps) {
+  return (
+    <Suspense fallback={null}>
+      <SmartSpaceCardInner {...props} />
+    </Suspense>
   );
 }

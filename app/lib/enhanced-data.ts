@@ -22,11 +22,16 @@ function transformLegacySpace(legacySpace: LegacySpace): Space {
   };
 
   // Generate workspace units based on space characteristics
+  // To avoid hydration errors, use deterministic status for SSR
   const generateWorkspaceUnits = (spaceId: string, teamCapacity: number): WorkspaceUnit[] => {
     const units: WorkspaceUnit[] = [];
     const offeredTypes = getOfferedSpaceTypes(spaceId);
-    
-    // Generate units based on team capacity
+    // Helper to deterministically assign status based on index
+    const getStatus = (idx: number, salt: string) => {
+      // Use a simple hash for deterministic pseudo-randomness
+      const hash = (spaceId + salt + idx).split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+      return hash % 5 === 0 ? 'booked' : 'available';
+    };
     if (offeredTypes.includes('hot-desk')) {
       for (let i = 1; i <= Math.min(10, Math.floor(teamCapacity * 0.6)); i++) {
         units.push({
@@ -36,7 +41,7 @@ function transformLegacySpace(legacySpace: LegacySpace): Space {
           spaceType: 'hot-desk',
           capacity: 1,
           amenities: ['WiFi', 'Power Outlet'],
-          status: Math.random() > 0.8 ? 'booked' : 'available',
+          status: getStatus(i, 'hot-desk'),
           price: {
             hourly: legacySpace.pricePerDay / 8,
             daily: legacySpace.pricePerDay * 0.8,
@@ -46,7 +51,6 @@ function transformLegacySpace(legacySpace: LegacySpace): Space {
         });
       }
     }
-
     if (offeredTypes.includes('desk')) {
       for (let i = 1; i <= Math.min(8, Math.floor(teamCapacity * 0.4)); i++) {
         units.push({
@@ -56,7 +60,7 @@ function transformLegacySpace(legacySpace: LegacySpace): Space {
           spaceType: 'desk',
           capacity: 1,
           amenities: ['WiFi', 'Power Outlet', 'Storage'],
-          status: Math.random() > 0.7 ? 'booked' : 'available',
+          status: getStatus(i, 'desk'),
           price: {
             hourly: legacySpace.pricePerDay / 6,
             daily: legacySpace.pricePerDay,
@@ -66,7 +70,6 @@ function transformLegacySpace(legacySpace: LegacySpace): Space {
         });
       }
     }
-
     if (offeredTypes.includes('private-office')) {
       const officeCount = Math.max(1, Math.floor(teamCapacity / 8));
       for (let i = 1; i <= officeCount; i++) {
@@ -77,7 +80,7 @@ function transformLegacySpace(legacySpace: LegacySpace): Space {
           spaceType: 'private-office',
           capacity: Math.min(8, Math.floor(teamCapacity / officeCount)),
           amenities: ['WiFi', 'Phone', 'Whiteboard', 'Storage', 'Privacy'],
-          status: Math.random() > 0.6 ? 'booked' : 'available',
+          status: getStatus(i, 'private-office'),
           price: {
             hourly: legacySpace.pricePerDay * 2.5,
             daily: legacySpace.pricePerDay * 3,
@@ -87,7 +90,6 @@ function transformLegacySpace(legacySpace: LegacySpace): Space {
         });
       }
     }
-
     if (offeredTypes.includes('meeting-room')) {
       for (let i = 1; i <= Math.max(2, Math.floor(teamCapacity / 10)); i++) {
         units.push({
@@ -97,7 +99,7 @@ function transformLegacySpace(legacySpace: LegacySpace): Space {
           spaceType: 'meeting-room',
           capacity: 6 + (i * 2),
           amenities: ['WiFi', 'TV/Projector', 'Whiteboard', 'Conference Phone'],
-          status: Math.random() > 0.5 ? 'booked' : 'available',
+          status: getStatus(i, 'meeting-room'),
           price: {
             hourly: legacySpace.pricePerDay * 1.5,
             daily: legacySpace.pricePerDay * 8,
@@ -107,7 +109,6 @@ function transformLegacySpace(legacySpace: LegacySpace): Space {
         });
       }
     }
-
     return units;
   };
 
@@ -117,6 +118,15 @@ function transformLegacySpace(legacySpace: LegacySpace): Space {
     unit.price.daily < min.price.daily ? unit : min, workspaceUnits[0]
   );
 
+  // Deterministic pseudo-random for top-level fields
+  const getTopLevelBool = (salt: string) => {
+    const hash = (legacySpace.id + salt).split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    return hash % 3 === 0;
+  };
+  const getApprovalType = () => {
+    const hash = (legacySpace.id + 'approval').split('').reduce((acc, c) => acc + c.charCodeAt(0), 0);
+    return hash % 2 === 0 ? 'instant' : 'manual';
+  };
   const enhancedSpace: Space = {
     id: legacySpace.id,
     title: legacySpace.title,
@@ -132,7 +142,7 @@ function transformLegacySpace(legacySpace: LegacySpace): Space {
     offeredSpaceTypes: getOfferedSpaceTypes(legacySpace.id),
     workspaceUnits,
     availability: {
-      instantBook: Math.random() > 0.3,
+      instantBook: getTopLevelBool('instantBook'),
       minStay: 1,
       maxStay: 365
     },
@@ -142,8 +152,8 @@ function transformLegacySpace(legacySpace: LegacySpace): Space {
       longTermDiscount: 35
     },
     contracts: {
-      available: legacySpace.type === 'Corporate Hub' || Math.random() > 0.4,
-      approvalType: Math.random() > 0.6 ? 'instant' : 'manual',
+      available: legacySpace.type === 'Corporate Hub' || getTopLevelBool('contracts'),
+      approvalType: getApprovalType(),
       plans: [
         {
           id: `${legacySpace.id}-plan-1`,

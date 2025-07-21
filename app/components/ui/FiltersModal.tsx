@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { X, Wifi, Car, Coffee, Monitor, Printer, Users, Building } from 'lucide-react';
+import { X, Wifi, Car, Coffee, Monitor, Printer, Users, Building, BedDouble, Bath, Star, Award, ChevronDown, ChevronUp, Languages, Accessibility, Home } from 'lucide-react';
 import { SpaceType } from '../../lib/types';
 
 interface FilterOptions {
@@ -23,6 +23,12 @@ export default function FiltersModal({ isOpen, onClose, onApplyFilters, mode }: 
   const [selectedSpaceType, setSelectedSpaceType] = useState<SpaceType | null>(null);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [bookingOptions, setBookingOptions] = useState<string[]>([]);
+  const [bedrooms, setBedrooms] = useState(0);
+  const [beds, setBeds] = useState(0);
+  const [bathrooms, setBathrooms] = useState(0);
+  const [showPropertyType, setShowPropertyType] = useState(false);
+  const [showAccessibility, setShowAccessibility] = useState(false);
+  const [showHostLanguage, setShowHostLanguage] = useState(false);
 
   if (!isOpen) return null;
 
@@ -102,6 +108,103 @@ export default function FiltersModal({ isOpen, onClose, onApplyFilters, mode }: 
 
           {/* Content */}
           <div className="p-6 space-y-8">
+            {/* Recommended for you */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Recommended for you</h3>
+              <div className="flex gap-3 overflow-x-auto pb-2">
+                <div className="flex flex-col items-center min-w-[80px]">
+                  <Coffee className="w-8 h-8 mb-1" />
+                  <span className="text-xs">Kitchen</span>
+                </div>
+                <div className="flex flex-col items-center min-w-[80px]">
+                  <Car className="w-8 h-8 mb-1" />
+                  <span className="text-xs">Free parking</span>
+                </div>
+                <div className="flex flex-col items-center min-w-[80px]">
+                  <Monitor className="w-8 h-8 mb-1" />
+                  <span className="text-xs">TV</span>
+                </div>
+                <div className="flex flex-col items-center min-w-[80px]">
+                  <Printer className="w-8 h-8 mb-1" />
+                  <span className="text-xs">Printer</span>
+                </div>
+                <div className="flex flex-col items-center min-w-[80px]">
+                  <Wifi className="w-8 h-8 mb-1" />
+                  <span className="text-xs">Wifi</span>
+                </div>
+              </div>
+            </div>
+            {/* Rooms and beds */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Rooms and beds</h3>
+              <div className="grid grid-cols-3 gap-4">
+                <div className="flex flex-col items-center">
+                  <span className="mb-1">Bedrooms</span>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => setBedrooms(Math.max(0, bedrooms - 1))} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center">-</button>
+                    <span className="w-6 text-center">{bedrooms === 0 ? 'Any' : bedrooms}</span>
+                    <button onClick={() => setBedrooms(bedrooms + 1)} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center">+</button>
+                  </div>
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="mb-1">Beds</span>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => setBeds(Math.max(0, beds - 1))} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center">-</button>
+                    <span className="w-6 text-center">{beds === 0 ? 'Any' : beds}</span>
+                    <button onClick={() => setBeds(beds + 1)} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center">+</button>
+                  </div>
+                </div>
+                <div className="flex flex-col items-center">
+                  <span className="mb-1">Bathrooms</span>
+                  <div className="flex items-center gap-2">
+                    <button onClick={() => setBathrooms(Math.max(0, bathrooms - 1))} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center">-</button>
+                    <span className="w-6 text-center">{bathrooms === 0 ? 'Any' : bathrooms}</span>
+                    <button onClick={() => setBathrooms(bathrooms + 1)} className="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center">+</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* Standout stays */}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Standout stays</h3>
+              <div className="flex gap-3">
+                <button className="flex flex-col items-center p-3 border rounded-lg hover:border-gray-400">
+                  <Star className="w-6 h-6 mb-1 text-yellow-400" />
+                  <span className="text-xs">Guest favorite</span>
+                </button>
+                <button className="flex flex-col items-center p-3 border rounded-lg hover:border-gray-400">
+                  <Award className="w-6 h-6 mb-1 text-purple-500" />
+                  <span className="text-xs">Luxe</span>
+                </button>
+              </div>
+            </div>
+            {/* Expandable sections */}
+            <div>
+              {/* Property type */}
+              <button onClick={() => setShowPropertyType(!showPropertyType)} className="flex items-center justify-between w-full py-3 border-b">
+                <span className="flex items-center gap-2"><Home className="w-5 h-5" /> Property type</span>
+                {showPropertyType ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+              {showPropertyType && (
+                <div className="py-3 pl-8 text-sm text-gray-700">Apartment, House, Loft, Villa, ...</div>
+              )}
+              {/* Accessibility features */}
+              <button onClick={() => setShowAccessibility(!showAccessibility)} className="flex items-center justify-between w-full py-3 border-b">
+                <span className="flex items-center gap-2"><Accessibility className="w-5 h-5" /> Accessibility features</span>
+                {showAccessibility ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+              {showAccessibility && (
+                <div className="py-3 pl-8 text-sm text-gray-700">Elevator, Step-free access, Accessible bathroom, ...</div>
+              )}
+              {/* Host language */}
+              <button onClick={() => setShowHostLanguage(!showHostLanguage)} className="flex items-center justify-between w-full py-3 border-b">
+                <span className="flex items-center gap-2"><Languages className="w-5 h-5" /> Host language</span>
+                {showHostLanguage ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+              </button>
+              {showHostLanguage && (
+                <div className="py-3 pl-8 text-sm text-gray-700">English, German, French, ...</div>
+              )}
+            </div>
             {/* Space Type */}
             <div>
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Type of workspace</h3>

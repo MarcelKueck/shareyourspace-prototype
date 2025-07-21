@@ -217,8 +217,16 @@ export default function FlexibleBookingPage() {
               isOpen={showFiltersModal}
               onClose={() => setShowFiltersModal(false)}
               onApplyFilters={(filters) => {
-                // You can merge filters into the search or call handleSearch with new filters
-                handleSearch({ ...filters });
+                // Ensure all required SearchFilters fields are present and spaceType is not null
+                const { spaceType, ...rest } = filters;
+                handleSearch({
+                  location: '',
+                  checkIn: '',
+                  checkOut: '',
+                  guests: 1,
+                  ...(spaceType ? { spaceType } : {}),
+                  ...rest,
+                });
               }}
               mode="flexible"
             />

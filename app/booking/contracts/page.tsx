@@ -327,7 +327,17 @@ export default function ContractsPage() {
             isOpen={showFiltersModal}
             onClose={() => setShowFiltersModal(false)}
             onApplyFilters={(filters) => {
-              handleSearch({ ...filters });
+              // Ensure all required SearchFilters fields are present
+              // Remove null from spaceType to satisfy SearchFilters type
+              const { spaceType, ...rest } = filters;
+              handleSearch({
+                location: locationFilter || '',
+                checkIn: '',
+                checkOut: '',
+                guests: 1,
+                ...(spaceType ? { spaceType } : {}),
+                ...rest,
+              });
             }}
             mode="contract"
           />
