@@ -2,12 +2,19 @@
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRef } from 'react';
-import { Space } from '../../lib/dummy-data';
+import { Space as LegacySpace } from '../../lib/dummy-data';
+import { Space as EnhancedSpace } from '../../lib/types';
 import SpaceCard from '../ui/SpaceCard';
+import SmartSpaceCard from '../ui/SmartSpaceCard';
 
 interface DiscoverySectionProps {
   title: string;
-  spaces: Space[];
+  spaces: LegacySpace[] | EnhancedSpace[];
+}
+
+// Type guard to check if space is enhanced
+function isEnhancedSpace(space: LegacySpace | EnhancedSpace): space is EnhancedSpace {
+  return 'basePrice' in space;
 }
 
 export default function DiscoverySection({ title, spaces }: DiscoverySectionProps) {
@@ -57,7 +64,11 @@ export default function DiscoverySection({ title, spaces }: DiscoverySectionProp
         >
           {spaces.map((space) => (
             <div key={space.id} className="flex-none w-60 sm:w-64 lg:w-72">
-              <SpaceCard space={space} />
+              {isEnhancedSpace(space) ? (
+                <SmartSpaceCard space={space} />
+              ) : (
+                <SpaceCard space={space} />
+              )}
             </div>
           ))}
         </div>

@@ -1,39 +1,65 @@
 'use client';
 
 import { useState } from 'react';
-import { Search, MapPin, Calendar, ChevronDown, Building } from 'lucide-react';
-import { spaces, bookingProducts, popularSearches } from './lib/dummy-data';
+import { Calendar, Building } from 'lucide-react';
+import { enhancedSpaces, searchSpaces } from './lib/enhanced-data';
+import { popularSearches } from './lib/dummy-data';
+import { SpaceType } from './lib/types';
 import DiscoverySection from './components/pages/DiscoverySection';
 import TargetGroupCarousel from './components/pages/TargetGroupCarousel';
+import SmartSearchBar, { SearchFilters } from './components/ui/SmartSearchBar';
+import SmartSpaceCard from './components/ui/SmartSpaceCard';
 
 export default function HomePage() {
-  const [activeSearchField, setActiveSearchField] = useState<string | null>(null);
-  const [location, setLocation] = useState('');
-  const [workspaceType, setWorkspaceType] = useState('');
-  const [bookingType, setBookingType] = useState('');
-  const [showWorkspaceDropdown, setShowWorkspaceDropdown] = useState(false);
-  const [showBookingDropdown, setShowBookingDropdown] = useState(false);
+  const [searchResults, setSearchResults] = useState(enhancedSpaces);
+  const [isSearchActive, setIsSearchActive] = useState(false);
+  const [bookingMode, setBookingMode] = useState<'flexible' | 'contract' | null>(null);
 
-  // Filter spaces by type for different sections
-  const corporateHubs = spaces.filter(space => space.type === 'Corporate Hub');
-  const proWorkspaces = spaces.filter(space => space.type === 'Pro Workspace');
-  const featuredSpaces = spaces.slice(0, 6); // First 6 spaces as featured
-
-  // Close dropdowns when clicking outside
-  const handleSearchBarClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleSearch = (filters: SearchFilters) => {
+    const results = searchSpaces(
+      enhancedSpaces,
+      filters.location || undefined,
+      filters.checkIn ? new Date(filters.checkIn) : undefined,
+      filters.checkOut ? new Date(filters.checkOut) : undefined,
+      filters.guests || undefined,
+      filters.maxPrice || undefined,
+      filters.spaceType || undefined
+    );
+    setSearchResults(results);
+    setIsSearchActive(true);
   };
 
-  const closeDropdowns = () => {
-    setShowWorkspaceDropdown(false);
-    setShowBookingDropdown(false);
-    setActiveSearchField(null);
+  const handleContractSearch = (spaceType: SpaceType) => {
+    // Filter spaces that have contracts available for the specified space type
+    const contractSpaces = enhancedSpaces.filter(space => 
+      space.contracts?.available && 
+      space.contracts.plans.some(plan => plan.spaceType === spaceType)
+    );
+    setSearchResults(contractSpaces);
+    setIsSearchActive(true);
   };
+
+  const clearSearch = () => {
+    setSearchResults(enhancedSpaces);
+    setIsSearchActive(false);
+    // Don't reset booking mode when clearing search, let user stay in their chosen flow
+  };
+
+  // Filter spaces by different categories using enhanced spaces
+  const featuredSpaces = enhancedSpaces.slice(0, 8);
+  const hourlySpaces = enhancedSpaces.filter(space => space.hourlyRate && space.hourlyRate <= 15);
+  const dailySpaces = enhancedSpaces.filter(space => space.basePrice <= 30);
+  const monthlySpaces = enhancedSpaces.filter(space => space.basePrice * 30 <= 300 * 30); // approximate monthly cost
+  const privateOffices = enhancedSpaces.filter(space => space.offeredSpaceTypes.includes('private-office'));
+  const meetingRooms = enhancedSpaces.filter(space => space.offeredSpaceTypes.includes('meeting-room'));
+  const corporateSpaces = enhancedSpaces.filter(space => space.type === 'Corporate Hub');
+  const premiumSpaces = enhancedSpaces.filter(space => space.basePrice > 400);
+  const budgetSpaces = enhancedSpaces.filter(space => space.basePrice <= 25);
 
   return (
-    <div className="min-h-screen" onClick={closeDropdowns}>
+    <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-screen min-h-[800px] flex items-center justify-center overflow-hidden">
+      <section className={`relative ${bookingMode ? 'min-h-screen' : 'h-screen min-h-[800px]'} flex items-center justify-center overflow-hidden`}>
         {/* Professional Background Image - Modern Office */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -52,7 +78,7 @@ export default function HomePage() {
         </div>
         
         {/* Hero Content */}
-        <div className="relative z-10 text-center text-white max-w-7xl mx-auto px-4">
+        <div className={`relative z-10 text-center text-white max-w-7xl mx-auto px-4 ${bookingMode ? 'py-20' : ''}`}>
           <div className="space-y-8 animate-fade-in-up">
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight">
               <span className="block">Find your perfect</span>
@@ -61,446 +87,207 @@ export default function HomePage() {
               </span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-200 max-w-4xl mx-auto leading-relaxed font-light">
-              Connect with inspiring spaces and like-minded professionals in the world&apos;s most dynamic work environments
+              Book flexible spaces or secure long-term workspace contracts in the world&apos;s most dynamic work environments
             </p>
           </div>
           
-          {/* Enhanced WeWork-style Search Bar */}
-          <div className="mt-16 max-w-7xl mx-auto relative z-[9999]">
-            <div className="bg-white/95 backdrop-blur-sm rounded-3xl p-2 shadow-2xl transition-all duration-500 hover:shadow-3xl relative z-[9999]" onClick={handleSearchBarClick}>
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-2">
-                
-                {/* Location Field */}
-                <div 
-                  className={`relative cursor-pointer transition-all duration-300 ${
-                    activeSearchField === 'location' ? 'transform scale-[1.02] shadow-lg' : ''
-                  }`}
-                  onClick={() => setActiveSearchField('location')}
-                >
-                  <div className="p-4 rounded-2xl hover:bg-gray-50/80 transition-all duration-200">
-                    <div className="flex items-center space-x-3">
-                      <MapPin className="w-5 h-5 text-blue-500 flex-shrink-0" />
-                      <div className="flex-1 text-left">
-                        <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-                          Location
-                        </label>
-                        <input
-                          type="text"
-                          value={location}
-                          onChange={(e) => setLocation(e.target.value)}
-                          placeholder="Search destinations"
-                          className="w-full text-gray-900 placeholder-gray-500 bg-transparent border-none outline-none text-base font-medium focus:placeholder-gray-400"
-                        />
-                      </div>
+          {/* Dual Booking Options - Only show when no mode is selected */}
+          {!bookingMode && (
+            <div className="mt-16 max-w-5xl mx-auto">
+              <div className="grid md:grid-cols-2 gap-6 animate-fade-in-up">
+                {/* Short-term Booking Card */}
+                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 hover:bg-white/15 hover:border-white/30 transition-all duration-300 group cursor-pointer transform hover:scale-105">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-500/30 transition-colors">
+                      <Calendar className="w-8 h-8 text-blue-300" />
                     </div>
+                    <h3 className="text-2xl font-bold mb-4">Book a Space</h3>
+                    <p className="text-gray-300 mb-6 leading-relaxed">
+                      Flexible hourly, daily, or weekly workspace bookings. Perfect for meetings, events, or temporary needs.
+                    </p>
+                    <button 
+                      onClick={() => setBookingMode('flexible')}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 px-6 rounded-xl font-semibold transition-colors group-hover:bg-blue-500"
+                    >
+                      Start Booking
+                    </button>
                   </div>
                 </div>
 
-                {/* Workspace Type Field */}
-                <div 
-                  className={`relative cursor-pointer transition-all duration-300 z-[60] ${
-                    activeSearchField === 'workspace' ? 'transform scale-[1.02] shadow-lg' : ''
-                  }`}
-                  onClick={() => {
-                    setActiveSearchField('workspace');
-                    setShowWorkspaceDropdown(!showWorkspaceDropdown);
-                    setShowBookingDropdown(false);
-                  }}
-                >
-                  <div className="p-4 rounded-2xl hover:bg-gray-50/80 transition-all duration-200">
-                    <div className="flex items-center space-x-3">
-                      <Building className="w-5 h-5 text-purple-500 flex-shrink-0" />
-                      <div className="flex-1 text-left">
-                        <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-                          Workspace Type
-                        </label>
-                        <div className="text-base font-medium text-gray-900">
-                          {workspaceType || 'Choose workspace style'}
-                        </div>
-                      </div>
-                      <ChevronDown className={`w-4 h-4 text-gray-400 flex-shrink-0 transition-transform duration-200 ${showWorkspaceDropdown ? 'rotate-180' : ''}`} />
+                {/* Long-term Contract Card */}
+                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 hover:bg-white/15 hover:border-white/30 transition-all duration-300 group cursor-pointer transform hover:scale-105">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-purple-500/30 transition-colors">
+                      <Building className="w-8 h-8 text-purple-300" />
                     </div>
+                    <h3 className="text-2xl font-bold mb-4">Get Workspace Contract</h3>
+                    <p className="text-gray-300 mb-6 leading-relaxed">
+                      Monthly workspace contracts with dedicated desks, offices, and team spaces. Better rates for committed teams.
+                    </p>
+                    <button 
+                      onClick={() => setBookingMode('contract')}
+                      className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-xl font-semibold transition-colors group-hover:bg-purple-500"
+                    >
+                      Explore Contracts
+                    </button>
                   </div>
-                  
-                  {/* Custom Workspace Dropdown */}
-                  {showWorkspaceDropdown && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[9999] animate-fade-in-up">
-                      <div 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setWorkspaceType('Corporate Hub');
-                          setShowWorkspaceDropdown(false);
-                        }}
-                        className="p-4 hover:bg-blue-50 transition-colors duration-200 border-b border-gray-100 cursor-pointer"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <div className="w-3 h-3 bg-blue-500 rounded-full flex-shrink-0"></div>
-                          <div>
-                            <h4 className="font-bold text-gray-900">Corporate Hub</h4>
-                            <p className="text-xs text-gray-600">Network with companies & teams</p>
-                          </div>
-                        </div>
-                      </div>
-                      <div 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setWorkspaceType('Pro Workspace');
-                          setShowWorkspaceDropdown(false);
-                        }}
-                        className="p-4 hover:bg-purple-50 transition-colors duration-200 cursor-pointer"
-                      >
-                        <div className="flex items-center space-x-3">
-                          <div className="w-3 h-3 bg-purple-500 rounded-full flex-shrink-0"></div>
-                          <div>
-                            <h4 className="font-bold text-gray-900">Pro Workspace</h4>
-                            <p className="text-xs text-gray-600">Professional spaces with ambassadors</p>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Booking Type Field */}
-                <div 
-                  className={`relative cursor-pointer transition-all duration-300 z-[60] ${
-                    activeSearchField === 'booking' ? 'transform scale-[1.02] shadow-lg' : ''
-                  }`}
-                  onClick={() => {
-                    setActiveSearchField('booking');
-                    setShowBookingDropdown(!showBookingDropdown);
-                    setShowWorkspaceDropdown(false);
-                  }}
-                >
-                  <div className="p-4 rounded-2xl hover:bg-gray-50/80 transition-all duration-200">
-                    <div className="flex items-center space-x-3">
-                      <Calendar className="w-5 h-5 text-green-500 flex-shrink-0" />
-                      <div className="flex-1 text-left">
-                        <label className="block text-xs font-semibold text-gray-700 uppercase tracking-wider mb-1">
-                          Booking Type
-                        </label>
-                        <div className="text-base font-medium text-gray-900">
-                          {bookingType || 'Select your plan'}
-                        </div>
-                      </div>
-                      <ChevronDown className={`w-4 h-4 text-gray-400 flex-shrink-0 transition-transform duration-200 ${showBookingDropdown ? 'rotate-180' : ''}`} />
-                    </div>
-                  </div>
-                  
-                  {/* Enhanced Booking Dropdown with Custom Durations */}
-                  {showBookingDropdown && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[9999] animate-fade-in-up max-w-md">
-                      <div className="p-4 border-b border-gray-100">
-                        <h3 className="text-lg font-semibold text-gray-900 mb-2">Choose Your Workspace Plan</h3>
-                        <p className="text-sm text-gray-600">Flexible options for any duration</p>
-                      </div>
-                      
-                      {/* Hourly Options */}
-                      <div className="p-4 border-b border-gray-100">
-                        <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
-                          <div className="w-3 h-3 bg-emerald-500 rounded-full mr-2"></div>
-                          Hourly Access
-                        </h4>
-                        <div className="space-y-2">
-                          <div 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setBookingType('2 Hours');
-                              setShowBookingDropdown(false);
-                            }}
-                            className="flex justify-between items-center p-3 hover:bg-emerald-50 rounded-lg cursor-pointer transition-colors"
-                          >
-                            <div>
-                              <span className="font-medium text-gray-900">Quick Session</span>
-                              <p className="text-xs text-gray-600">2-4 hours</p>
-                            </div>
-                            <span className="text-sm font-semibold text-emerald-600">€8-16</span>
-                          </div>
-                          <div 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setBookingType('Half Day');
-                              setShowBookingDropdown(false);
-                            }}
-                            className="flex justify-between items-center p-3 hover:bg-emerald-50 rounded-lg cursor-pointer transition-colors"
-                          >
-                            <div>
-                              <span className="font-medium text-gray-900">Half Day</span>
-                              <p className="text-xs text-gray-600">4-6 hours</p>
-                            </div>
-                            <span className="text-sm font-semibold text-emerald-600">€16-24</span>
-                          </div>
-                          <div 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setBookingType('Full Day');
-                              setShowBookingDropdown(false);
-                            }}
-                            className="flex justify-between items-center p-3 hover:bg-emerald-50 rounded-lg cursor-pointer transition-colors"
-                          >
-                            <div>
-                              <span className="font-medium text-gray-900">Full Day</span>
-                              <p className="text-xs text-gray-600">8+ hours</p>
-                            </div>
-                            <span className="text-sm font-semibold text-emerald-600">€25</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Multi-Day Options */}
-                      <div className="p-4 border-b border-gray-100">
-                        <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
-                          <div className="w-3 h-3 bg-green-500 rounded-full mr-2"></div>
-                          Multi-Day Access
-                        </h4>
-                        <div className="space-y-2">
-                          <div 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setBookingType('Week Pass');
-                              setShowBookingDropdown(false);
-                            }}
-                            className="flex justify-between items-center p-3 hover:bg-green-50 rounded-lg cursor-pointer transition-colors"
-                          >
-                            <div>
-                              <span className="font-medium text-gray-900">Week Pass</span>
-                              <p className="text-xs text-gray-600">5-7 days</p>
-                            </div>
-                            <span className="text-sm font-semibold text-green-600">€110-140</span>
-                          </div>
-                          <div 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setBookingType('Custom Days');
-                              setShowBookingDropdown(false);
-                            }}
-                            className="flex justify-between items-center p-3 hover:bg-green-50 rounded-lg cursor-pointer transition-colors"
-                          >
-                            <div>
-                              <span className="font-medium text-gray-900">Custom Period</span>
-                              <p className="text-xs text-gray-600">Choose your dates</p>
-                            </div>
-                            <span className="text-sm font-semibold text-green-600">€25/day</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Monthly & Long-term Options */}
-                      <div className="p-4 border-b border-gray-100">
-                        <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
-                          <div className="w-3 h-3 bg-blue-500 rounded-full mr-2"></div>
-                          Monthly & Long-term
-                        </h4>
-                        <div className="space-y-2">
-                          <div 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setBookingType('1 Month');
-                              setShowBookingDropdown(false);
-                            }}
-                            className="flex justify-between items-center p-3 hover:bg-blue-50 rounded-lg cursor-pointer transition-colors"
-                          >
-                            <div>
-                              <span className="font-medium text-gray-900">Monthly Desk</span>
-                              <p className="text-xs text-gray-600">30 days, dedicated space</p>
-                            </div>
-                            <span className="text-sm font-semibold text-blue-600">€200</span>
-                          </div>
-                          <div 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setBookingType('3 Months');
-                              setShowBookingDropdown(false);
-                            }}
-                            className="flex justify-between items-center p-3 hover:bg-blue-50 rounded-lg cursor-pointer transition-colors"
-                          >
-                            <div>
-                              <span className="font-medium text-gray-900">Quarterly</span>
-                              <p className="text-xs text-gray-600">3 months, 15% savings</p>
-                            </div>
-                            <span className="text-sm font-semibold text-blue-600">€510</span>
-                          </div>
-                          <div 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setBookingType('6+ Months');
-                              setShowBookingDropdown(false);
-                            }}
-                            className="flex justify-between items-center p-3 hover:bg-blue-50 rounded-lg cursor-pointer transition-colors"
-                          >
-                            <div>
-                              <span className="font-medium text-gray-900">Long-term</span>
-                              <p className="text-xs text-gray-600">6+ months, best rates</p>
-                            </div>
-                            <span className="text-sm font-semibold text-blue-600">From €170/mo</span>
-                          </div>
-                        </div>
-                      </div>
-
-                      {/* Team Options */}
-                      <div className="p-4">
-                        <h4 className="font-semibold text-gray-900 mb-3 flex items-center">
-                          <div className="w-3 h-3 bg-purple-500 rounded-full mr-2"></div>
-                          Team Solutions
-                        </h4>
-                        <div className="space-y-2">
-                          <div 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setBookingType('Meeting Room');
-                              setShowBookingDropdown(false);
-                            }}
-                            className="flex justify-between items-center p-3 hover:bg-purple-50 rounded-lg cursor-pointer transition-colors"
-                          >
-                            <div>
-                              <span className="font-medium text-gray-900">Meeting Room</span>
-                              <p className="text-xs text-gray-600">2-8 people, hourly</p>
-                            </div>
-                            <span className="text-sm font-semibold text-purple-600">€50/hr</span>
-                          </div>
-                          <div 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setBookingType('Private Office');
-                              setShowBookingDropdown(false);
-                            }}
-                            className="flex justify-between items-center p-3 hover:bg-purple-50 rounded-lg cursor-pointer transition-colors"
-                          >
-                            <div>
-                              <span className="font-medium text-gray-900">Private Office</span>
-                              <p className="text-xs text-gray-600">2-12 people, monthly</p>
-                            </div>
-                            <span className="text-sm font-semibold text-purple-600">€800/mo</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Search Button */}
-                <div className="p-2">
-                  <button className="w-full h-full bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 text-white rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 hover:shadow-2xl flex items-center justify-center space-x-2 min-h-[64px] text-base">
-                    <Search className="w-5 h-5" />
-                    <span>Search</span>
-                  </button>
                 </div>
               </div>
             </div>
+          )}
 
-            {/* Popular Searches */}
-            <div className="mt-10 animate-fade-in-up delay-300">
-              <p className="text-gray-300 text-sm mb-6 font-medium">Popular searches:</p>
-              <div className="flex flex-wrap gap-4 justify-center">
-                {popularSearches.map((search, index) => (
-                  <button
-                    key={index}
-                    className="px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white text-sm font-medium hover:bg-white/20 hover:border-white/30 transition-all duration-300 hover:scale-105 hover:shadow-lg"
-                  >
-                    {search}
-                  </button>
-                ))}
+          {/* Search Interface Based on Selected Mode */}
+          {bookingMode && (
+            <div className="mt-16 max-w-7xl mx-auto animate-fade-in-up">
+              {/* Back Button */}
+              <div className="mb-8">
+                <button
+                  onClick={() => setBookingMode(null)}
+                  className="inline-flex items-center px-4 py-2 text-sm text-gray-300 hover:text-white transition-colors"
+                >
+                  <span className="mr-2">←</span>
+                  Back to options
+                </button>
               </div>
+
+              {bookingMode === 'flexible' ? (
+                <>
+                  <h4 className="text-xl font-semibold mb-6">Find your flexible workspace</h4>
+                  <SmartSearchBar onSearch={handleSearch} />
+                  
+                  {/* Popular Searches */}
+                  <div className="mt-8 mb-12">
+                    <p className="text-gray-300 text-sm mb-4 font-medium">Popular searches:</p>
+                    <div className="flex flex-wrap gap-3 justify-center">
+                      {popularSearches.map((search, index) => (
+                        <button
+                          key={index}
+                          className="px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white text-sm font-medium hover:bg-white/20 hover:border-white/30 transition-all duration-300"
+                        >
+                          {search}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center mb-12">
+                  <h4 className="text-xl font-semibold mb-6">Browse workspace contracts</h4>
+                  <div className="flex flex-wrap gap-4 justify-center">
+                    <button
+                      onClick={() => handleContractSearch('hot-desk')}
+                      className="px-6 py-3 bg-purple-600/20 backdrop-blur-sm border border-purple-300/30 rounded-full text-purple-200 font-medium hover:bg-purple-600/30 transition-all duration-300"
+                    >
+                      Hot Desk Plans
+                    </button>
+                    <button
+                      onClick={() => handleContractSearch('desk')}
+                      className="px-6 py-3 bg-purple-600/20 backdrop-blur-sm border border-purple-300/30 rounded-full text-purple-200 font-medium hover:bg-purple-600/30 transition-all duration-300"
+                    >
+                      Dedicated Desks
+                    </button>
+                    <button
+                      onClick={() => handleContractSearch('private-office')}
+                      className="px-6 py-3 bg-purple-600/20 backdrop-blur-sm border border-purple-300/30 rounded-full text-purple-200 font-medium hover:bg-purple-600/30 transition-all duration-300"
+                    >
+                      Private Offices
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
+          )}
+        </div>
+      </section>
+
+      {/* Dynamic Target Group Solutions Section - Only show when no search is active and no booking mode is selected */}
+      {!isSearchActive && !bookingMode && (
+        <section className="h-screen min-h-[800px] flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+          {/* Background Pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 left-0 w-full h-full" style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+            }}></div>
           </div>
-        </div>
-      </section>
+          
+          <div className="w-full h-full overflow-hidden">
+            <TargetGroupCarousel />
+          </div>
+        </section>
+      )}
 
-      {/* Dynamic Target Group Solutions Section - Full Viewport Scaling */}
-      <section className="h-screen min-h-[800px] flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-10">
-          <div className="absolute top-0 left-0 w-full h-full" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-          }}></div>
-        </div>
-        
-        <div className="w-full h-full overflow-hidden">
-          <TargetGroupCarousel />
-        </div>
-      </section>
-
-      {/* Discovery Sections */}
+      {/* Discovery Sections or Search Results */}
       <div className="bg-white">
-        {/* Featured Workspaces */}
-        <DiscoverySection 
-          title="Featured Workspaces" 
-          spaces={featuredSpaces} 
-        />
-        
-        {/* Hourly Passes */}
-        <DiscoverySection 
-          title="Perfect for Hourly Work" 
-          spaces={spaces.filter(space => 
-            bookingProducts.some(bp => 
-              bp.spaceId === space.id && bp.type === 'Hourly Pass'
-            )
-          ).slice(0, 8)} 
-        />
-        
-        {/* Day Pass Friendly */}
-        <DiscoverySection 
-          title="Perfect for Day Passes" 
-          spaces={spaces.filter(space => 
-            bookingProducts.some(bp => 
-              bp.spaceId === space.id && bp.type === 'Day Pass'
-            )
-          ).slice(0, 8)} 
-        />
-        
-        {/* Monthly Desks */}
-        <DiscoverySection 
-          title="Monthly Desk Options" 
-          spaces={spaces.filter(space => 
-            bookingProducts.some(bp => 
-              bp.spaceId === space.id && bp.type === 'Monthly Desk'
-            )
-          ).slice(0, 8)} 
-        />
-        
-        {/* Private Offices */}
-        <DiscoverySection 
-          title="Private Office Suites" 
-          spaces={spaces.filter(space => 
-            bookingProducts.some(bp => 
-              bp.spaceId === space.id && bp.type === 'Private Office'
-            )
-          ).slice(0, 8)} 
-        />
-        
-        {/* Team Rooms */}
-        <DiscoverySection 
-          title="Team Collaboration Rooms" 
-          spaces={spaces.filter(space => 
-            bookingProducts.some(bp => 
-              bp.spaceId === space.id && bp.type === 'Team Room'
-            )
-          ).slice(0, 8)} 
-        />
-        
-        {/* Corporate Hubs */}
-        <DiscoverySection 
-          title="Corporate Innovation Hubs" 
-          spaces={corporateHubs} 
-        />
-        
-        {/* Professional Workspaces */}
-        <DiscoverySection 
-          title="Professional Workspaces" 
-          spaces={proWorkspaces} 
-        />
-        
-        {/* Premium Locations */}
-        <DiscoverySection 
-          title="Premium Locations" 
-          spaces={spaces.filter(space => space.pricePerMonth > 400).slice(0, 8)} 
-        />
-        
-        {/* Budget-Friendly */}
-        <DiscoverySection 
-          title="Great Value Workspaces" 
-          spaces={spaces.filter(space => space.pricePerMonth <= 300).slice(0, 8)} 
-        />
+        {isSearchActive ? (
+          /* Search Results */
+          <section className="py-12">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex justify-between items-center mb-8">
+                <div>
+                  <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                    {searchResults.length} {bookingMode === 'contract' ? 'workspace' : 'space'}{searchResults.length !== 1 ? 's' : ''} found
+                  </h2>
+                  <p className="text-gray-600">
+                    {bookingMode === 'contract' 
+                      ? 'Discover workspace contracts for long-term productivity' 
+                      : 'Discover the perfect space for your flexible booking needs'}
+                  </p>
+                </div>
+                <button
+                  onClick={clearSearch}
+                  className="px-6 py-3 text-blue-600 hover:text-blue-800 font-medium border border-blue-200 hover:border-blue-300 rounded-xl transition-colors"
+                >
+                  Browse all spaces
+                </button>
+              </div>
+              
+              {searchResults.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {searchResults.map((space) => (
+                    <SmartSpaceCard 
+                      key={space.id} 
+                      space={space} 
+                      showContracts={bookingMode === 'contract'}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-16">
+                  <div className="max-w-md mx-auto">
+                    <div className="mb-6">
+                      <div className="w-24 h-24 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
+                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No spaces found</h3>
+                    <p className="text-gray-600 mb-6">Try adjusting your search criteria or browse all available workspaces.</p>
+                    <button
+                      onClick={clearSearch}
+                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-colors"
+                    >
+                      Browse all spaces
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </section>
+        ) : (
+          /* Discovery Sections */
+          <>
+            <DiscoverySection title="Featured Workspaces" spaces={featuredSpaces} />
+            <DiscoverySection title="Great Hourly Rates" spaces={hourlySpaces} />
+            <DiscoverySection title="Perfect for Day Passes" spaces={dailySpaces} />
+            <DiscoverySection title="Monthly Desk Options" spaces={monthlySpaces} />
+            <DiscoverySection title="Private Office Suites" spaces={privateOffices} />
+            <DiscoverySection title="Meeting Room Solutions" spaces={meetingRooms} />
+            <DiscoverySection title="Corporate Innovation Hubs" spaces={corporateSpaces} />
+            <DiscoverySection title="Premium Locations" spaces={premiumSpaces} />
+            <DiscoverySection title="Great Value Workspaces" spaces={budgetSpaces} />
+          </>
+        )}
       </div>
     </div>
   );

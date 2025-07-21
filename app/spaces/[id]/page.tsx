@@ -1,11 +1,17 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { notFound } from 'next/navigation';
+import { notFound, useSearchParams } from 'next/navigation';
 import Image from 'next/image';
-import { Star, MapPin, Wifi, Coffee, Phone, Calendar, Users as UsersIcon, ChevronLeft, ChevronRight } from 'lucide-react';
-import { spaces, users, reviews, bookingProducts } from '../../lib/dummy-data';
-import BookingWidget from '../../components/ui/BookingWidget';
+import Link from 'next/link';
+import { Star, MapPin, Wifi, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
+import { users, reviews } from '../../lib/dummy-data';
+import { enhancedSpaces } from '../../lib/enhanced-data';
+import { WorkspaceUnit, SpaceType } from '../../lib/types';
+import FlexibleBookingWidget from '../../components/ui/FlexibleBookingWidget';
+import WorkspaceContractWidget from '../../components/ui/WorkspaceContractWidget';
+import WorkspaceSelectionWidget from '../../components/ui/WorkspaceSelectionWidget';
+import { useSearchStore } from '../../store/searchStore';
 
 interface PageProps {
   params: Promise<{
@@ -16,7 +22,15 @@ interface PageProps {
 export default function SpacePage({ params }: PageProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [spaceId, setSpaceId] = useState<string | null>(null);
+  const searchParams = useSearchParams();
+  const mode = searchParams.get('mode') as 'flexible' | 'contract' || 'flexible';
   
+  const { spaceType: storedSpaceType } = useSearchStore();
+  const urlType = searchParams.get('type') as SpaceType | null;
+  const initialType = urlType || storedSpaceType;
+  
+  const [selectedUnit, setSelectedUnit] = useState<WorkspaceUnit | null>(null);
+
   useEffect(() => {
     const getParams = async () => {
       const resolvedParams = await params;
@@ -25,260 +39,157 @@ export default function SpacePage({ params }: PageProps) {
     getParams();
   }, [params]);
 
+  const space = enhancedSpaces.find((s) => s.id === spaceId);
+
+  useEffect(() => {
+    if (space && !selectedUnit) {
+        const availableUnits = space.workspaceUnits.filter(u => u.status === 'available');
+        if (initialType) {
+            const firstUnitOfType = availableUnits.find(u => u.spaceType === initialType);
+            if (firstUnitOfType) {
+                setSelectedUnit(firstUnitOfType);
+                return;
+            }
+        }
+        if (availableUnits.length > 0) {
+            setSelectedUnit(availableUnits[0]);
+        }
+    }
+  }, [space, initialType, selectedUnit]);
+  
   if (!spaceId) {
-    return <div>Loading...</div>;
+    return <div className="bg-white text-black p-8">Loading...</div>;
   }
 
-  // Find the space by ID
-  const space = spaces.find((s) => s.id === spaceId);
   if (!space) {
     notFound();
   }
 
-  // Find the host
   const host = users.find((u) => u.id === space.hostId);
   
-  // Find hub ambassador if it's a Pro Workspace
   const hubAmbassador = space.type === 'Pro Workspace' 
-    ? users.find((u) => u.role === 'hub-ambassador')
+    ? users.find(u => u.role === 'hub-ambassador')
     : null;
 
-  // Get reviews for this space
   const spaceReviews = reviews.filter((r) => r.spaceId === space.id);
-  
-  // Get booking products for this space
-  const spaceBookingProducts = bookingProducts.filter((bp) => bp.spaceId === space.id);
 
   const nextImage = () => {
-    setCurrentImageIndex((prev) => 
-      prev === space.imageUrls.length - 1 ? 0 : prev + 1
-    );
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % space.imageUrls.length);
   };
 
   const prevImage = () => {
-    setCurrentImageIndex((prev) => 
-      prev === 0 ? space.imageUrls.length - 1 : prev - 1
-    );
+    setCurrentImageIndex((prevIndex) => (prevIndex - 1 + space.imageUrls.length) % space.imageUrls.length);
   };
 
-  const amenityIcons: { [key: string]: React.ReactNode } = {
-    'WiFi': <Wifi className="w-5 h-5" />,
-    'Coffee': <Coffee className="w-5 h-5" />,
-    'Phone Booths': <Phone className="w-5 h-5" />,
-    'Meeting Rooms': <UsersIcon className="w-5 h-5" />,
-    '24/7 Access': <Calendar className="w-5 h-5" />,
+  const handleUnitSelect = (unit: WorkspaceUnit | null) => {
+    setSelectedUnit(unit);
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Photo Gallery */}
-      <div className="relative h-[60vh] md:h-[70vh]">
-        <Image
-          src={space.imageUrls[currentImageIndex]}
-          alt={`${space.title} - Image ${currentImageIndex + 1}`}
-          fill
-          className="object-cover"
-          priority
-        />
-        
-        {/* Navigation Arrows */}
-        {space.imageUrls.length > 1 && (
-          <>
-            <button
-              onClick={prevImage}
-              className="absolute left-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all"
-            >
-              <ChevronLeft className="w-6 h-6 text-gray-800" />
-            </button>
-            <button
-              onClick={nextImage}
-              className="absolute right-4 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white p-2 rounded-full shadow-lg transition-all"
-            >
-              <ChevronRight className="w-6 h-6 text-gray-800" />
-            </button>
-          </>
-        )}
+    <div className="bg-white text-gray-800">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        {/* Back to search link */}
+        <Link href="/" className="text-sm text-blue-600 hover:underline mb-4 inline-block">
+          <ArrowLeft className="w-4 h-4 inline-block mr-1" />
+          Back to search
+        </Link>
 
-        {/* Image Indicators */}
-        {space.imageUrls.length > 1 && (
-          <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-            {space.imageUrls.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentImageIndex(index)}
-                className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentImageIndex ? 'bg-white' : 'bg-white/50'
-                }`}
-              />
-            ))}
+        {/* Title and details */}
+        <div className="mb-6">
+          <h1 className="text-4xl font-bold text-gray-900 mb-2">{space.title}</h1>
+          <div className="flex items-center space-x-4 text-sm">
+            <div className="flex items-center">
+              <Star className="w-4 h-4 text-yellow-500 fill-current mr-1" />
+              <span>4.9 ({spaceReviews.length} reviews)</span>
+            </div>
+            <div className="flex items-center">
+              <MapPin className="w-4 h-4 mr-1" />
+              <span>{space.location}</span>
+            </div>
+            <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
+              space.type === 'Corporate Hub' 
+                ? 'bg-blue-100 text-blue-800' 
+                : 'bg-green-100 text-green-800'
+            }`}>
+              {space.type}
+            </span>
           </div>
-        )}
-
-        {/* Space Type Badge */}
-        <div className="absolute top-6 left-6">
-          <span className={`px-3 py-1 text-sm font-medium rounded-full ${
-            space.type === 'Corporate Hub' 
-              ? 'bg-blue-100 text-blue-800' 
-              : 'bg-green-100 text-green-800'
-          }`}>
-            {space.type}
-          </span>
         </div>
-      </div>
 
-      {/* Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Left Column */}
-          <div className="lg:col-span-2 space-y-8">
-            {/* Title and Location */}
-            <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-                {space.title}
-              </h1>
-              <div className="flex items-center text-gray-600 mb-4">
-                <MapPin className="w-5 h-5 mr-2" />
-                <span className="text-lg">{space.location}</span>
+        {/* Image Gallery */}
+        <div className="relative w-full h-[500px] rounded-2xl overflow-hidden mb-8 shadow-lg">
+          <Image
+            src={space.imageUrls[currentImageIndex]}
+            alt={space.title}
+            layout="fill"
+            objectFit="cover"
+            className="transition-transform duration-500 ease-in-out"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
+          <button onClick={prevImage} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-md">
+            <ChevronLeft className="w-6 h-6 text-gray-800" />
+          </button>
+          <button onClick={nextImage} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-md">
+            <ChevronRight className="w-6 h-6 text-gray-800" />
+          </button>
+        </div>
+
+        {/* Main Content */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
+          <div className="lg:col-span-2">
+            {/* Host Info */}
+            <div className="flex items-center justify-between pb-6 border-b border-gray-200">
+              <div>
+                <h2 className="text-2xl font-semibold">Hosted by {host?.name}</h2>
+                <p className="text-gray-600">
+                  {space.type === 'Pro Workspace' && hubAmbassador ? `Hub Ambassador: ${hubAmbassador.name}` : `Part of ${host?.company}`}
+                </p>
               </div>
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center">
-                  <Star className="w-5 h-5 fill-yellow-400 text-yellow-400 mr-1" />
-                  <span className="font-medium">4.8</span>
-                  <span className="text-gray-600 ml-1">({spaceReviews.length} reviews)</span>
-                </div>
-              </div>
+              <Image
+                src={host?.profileImageUrl || ''}
+                alt={host?.name || ''}
+                width={64}
+                height={64}
+                className="rounded-full"
+              />
             </div>
 
-            {/* Host Information */}
-            <div className="border-t border-gray-200 pt-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">
-                {space.type === 'Corporate Hub' ? 'Hosted by' : 'Managed by'}
-              </h2>
-              <div className="flex items-start space-x-4">
-                <Image
-                  src={host?.profileImageUrl || '/placeholder-avatar.jpg'}
-                  alt={host?.name || 'Host'}
-                  width={60}
-                  height={60}
-                  className="rounded-full"
-                />
-                <div>
-                  <h3 className="font-semibold text-gray-900">{host?.name}</h3>
-                  <p className="text-gray-600">{host?.title} at {host?.company}</p>
-                  <p className="text-gray-700 mt-2">{host?.bio}</p>
-                </div>
-              </div>
-
-              {/* Hub Ambassador for Pro Workspaces */}
-              {hubAmbassador && space.type === 'Pro Workspace' && (
-                <div className="mt-6 p-4 bg-green-50 rounded-lg">
-                  <h4 className="font-medium text-green-800 mb-2">Your On-Site Hub Ambassador</h4>
-                  <div className="flex items-center space-x-3">
-                    <Image
-                      src={hubAmbassador.profileImageUrl}
-                      alt={hubAmbassador.name}
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    />
-                    <div>
-                      <p className="font-medium text-green-800">{hubAmbassador.name}</p>
-                      <p className="text-sm text-green-700">{hubAmbassador.bio}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
+            <WorkspaceSelectionWidget 
+              space={space}
+              initialType={initialType}
+              onUnitSelect={handleUnitSelect}
+              selectedUnit={selectedUnit}
+            />
 
             {/* Description */}
-            <div className="border-t border-gray-200 pt-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">About this workspace</h2>
-              <p className="text-gray-700 leading-relaxed">{space.description}</p>
+            <div className="py-6 border-b border-gray-200">
+              <h3 className="text-xl font-semibold mb-4">About this space</h3>
+              <p className="text-gray-600 whitespace-pre-line">{space.description}</p>
             </div>
 
             {/* Amenities */}
-            <div className="border-t border-gray-200 pt-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">What this space offers</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                {space.amenities.map((amenity, index) => (
-                  <div key={index} className="flex items-center space-x-3 p-3 rounded-lg hover:bg-gray-50 transition-colors">
-                    {amenityIcons[amenity] || <div className="w-5 h-5 bg-gray-300 rounded" />}
-                    <span className="text-gray-700">{amenity}</span>
+            <div className="py-6">
+              <h3 className="text-xl font-semibold mb-4">What this place offers</h3>
+              <div className="grid grid-cols-2 gap-4">
+                {space.amenities.map((amenity) => (
+                  <div key={amenity} className="flex items-center">
+                    <Wifi className="w-5 h-5 mr-3 text-gray-700" />
+                    <span>{amenity}</span>
                   </div>
                 ))}
-              </div>
-            </div>
-
-            {/* Booking Options */}
-            <div className="border-t border-gray-200 pt-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Booking Options</h2>
-              <div className="grid gap-4">
-                {spaceBookingProducts.map((product) => (
-                  <div key={product.type} className="border border-gray-200 rounded-lg p-4">
-                    <div className="flex justify-between items-center">
-                      <div>
-                        <h3 className="font-medium text-gray-900">{product.type}</h3>
-                        <p className="text-gray-600">
-                          {product.quantity} spots available
-                        </p>
-                      </div>
-                      <div className="text-right">
-                        <span className="text-xl font-bold text-gray-900">${product.price}</span>
-                        <p className="text-gray-600">
-                          {product.type === 'Day Pass' ? 'per day' : 'per month'}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Reviews */}
-            <div className="border-t border-gray-200 pt-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">
-                Reviews ({spaceReviews.length})
-              </h2>
-              <div className="space-y-6">
-                {spaceReviews.map((review, index) => {
-                  const reviewer = users.find(u => u.id === review.userId);
-                  return (
-                    <div key={index} className="flex space-x-4">
-                      <Image
-                        src={reviewer?.profileImageUrl || '/placeholder-avatar.jpg'}
-                        alt={reviewer?.name || 'Reviewer'}
-                        width={48}
-                        height={48}
-                        className="rounded-full"
-                      />
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <h4 className="font-medium text-gray-900">{reviewer?.name}</h4>
-                          <div className="flex items-center">
-                            {[...Array(5)].map((_, i) => (
-                              <Star
-                                key={i}
-                                className={`w-4 h-4 ${
-                                  i < review.rating 
-                                    ? 'fill-yellow-400 text-yellow-400' 
-                                    : 'text-gray-300'
-                                }`}
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        <p className="text-gray-700">{review.comment}</p>
-                      </div>
-                    </div>
-                  );
-                })}
               </div>
             </div>
           </div>
 
-          {/* Right Column - Booking Widget */}
+          {/* Booking Widget Column */}
           <div className="lg:col-span-1">
-            <BookingWidget space={space} />
+            <div className="sticky top-24">
+              {mode === 'flexible' ? (
+                <FlexibleBookingWidget space={space} selectedUnit={selectedUnit} />
+              ) : (
+                <WorkspaceContractWidget space={space} selectedUnit={selectedUnit} />
+              )}
+            </div>
           </div>
         </div>
       </div>

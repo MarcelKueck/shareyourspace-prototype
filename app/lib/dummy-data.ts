@@ -428,7 +428,7 @@ export const spaces: Space[] = [
     title: 'SAP Innovation Hub Berlin',
     hostId: 'u1',
     type: 'Corporate Hub',
-    location: 'Berlin Mitte, Deutschland',
+    location: 'Berlin Mitte, Germany',
     pricePerMonth: 720,
     pricePerDay: 38,
     imageUrls: [
@@ -436,8 +436,8 @@ export const spaces: Space[] = [
       'https://images.unsplash.com/photo-1497366811353-6870744d04b2?w=800',
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800'
     ],
-    amenities: ['Schnelles WLAN', 'Kaffee-Lounge', 'Besprechungsräume', '24/7 Zugang', 'Parkplatz', 'Fitnessraum'],
-    description: 'Modernes Tech-Hub in Berlin Mitte mit innovativen Einrichtungen und lebendiger Startup-Szene.',
+    amenities: ['High-Speed WiFi', 'Coffee Lounge', 'Meeting Rooms', '24/7 Access', 'Parking', 'Gym'],
+    description: 'Modern tech hub in Berlin Mitte with innovative facilities and vibrant startup scene.',
     teamCapacity: 25,
     corporateHostBenefits: {
       isVerifiedHost: true,
@@ -450,7 +450,7 @@ export const spaces: Space[] = [
     title: 'Rocket Internet Campus',
     hostId: 'u1',
     type: 'Corporate Hub',
-    location: 'Berlin Kreuzberg, Deutschland',
+    location: 'Berlin Kreuzberg, Germany',
     pricePerMonth: 650,
     pricePerDay: 35,
     imageUrls: [
@@ -458,8 +458,8 @@ export const spaces: Space[] = [
       'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=800',
       'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=800'
     ],
-    amenities: ['Highspeed Internet', 'Event Space', 'Mentoring', 'Tech Talks', 'Küche', 'Schließfächer'],
-    description: 'Rockets Community Hub für Entwickler und Unternehmer mit erstklassigen Mentoring-Programmen.',
+    amenities: ['High-Speed Internet', 'Event Space', 'Mentoring', 'Tech Talks', 'Kitchen', 'Lockers'],
+    description: 'Rocket\'s community hub for developers and entrepreneurs with world-class mentoring programs.',
     teamCapacity: 20,
     corporateHostBenefits: {
       isVerifiedHost: true,
@@ -472,7 +472,7 @@ export const spaces: Space[] = [
     title: 'Siemens Digital Factory',
     hostId: 'u1',
     type: 'Corporate Hub',
-    location: 'München, Deutschland',
+    location: 'Munich, Germany',
     pricePerMonth: 780,
     pricePerDay: 42,
     imageUrls: [
@@ -480,8 +480,8 @@ export const spaces: Space[] = [
       'https://images.unsplash.com/photo-1497366412874-3415097a27e7?w=800',
       'https://images.unsplash.com/photo-1524758631624-e2822e304c36?w=800'
     ],
-    amenities: ['Glasfaser Internet', 'Massage Räume', 'Ruhezonen', 'Gourmet Café', 'Fahrradverleih', 'Meditationsraum'],
-    description: 'Erleben Sie Siemens innovative Arbeitskultur in diesem Premium-Campus-Workspace mit erstklassigen Annehmlichkeiten.',
+    amenities: ['Fiber Internet', 'Massage Rooms', 'Quiet Zones', 'Gourmet Cafe', 'Bike Rental', 'Meditation Room'],
+    description: 'Experience Siemens innovative work culture in this premium campus workspace with world-class amenities.',
     teamCapacity: 30,
     corporateHostBenefits: {
       isVerifiedHost: true,
@@ -494,7 +494,7 @@ export const spaces: Space[] = [
     title: 'N26 Fintech Hub',
     hostId: 'u1',
     type: 'Corporate Hub',
-    location: 'Berlin Friedrichshain, Deutschland',
+    location: 'Berlin Friedrichshain, Germany',
     pricePerMonth: 580,
     pricePerDay: 32,
     imageUrls: [
@@ -503,7 +503,7 @@ export const spaces: Space[] = [
       'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800'
     ],
     amenities: ['WiFi', 'Fintech Labs', 'Product Labs', 'Mentoring', 'Demo Days', 'Networking Events'],
-    description: 'Schließen Sie sich N26s Fintech-Accelerator-Umgebung an mit Zugang zu Banking-Services und Branchenexperten.',
+    description: 'Join N26\'s fintech accelerator environment with access to banking services and industry experts.',
     corporateHostBenefits: {
       isVerifiedHost: true,
       offersEmployeeBenefits: true,
@@ -772,22 +772,22 @@ export const bookingProducts: BookingProduct[] = [
 
 // Comprehensive Reviews
 export const reviews: Review[] = [
-  { spaceId: 'space-1', userId: 'u3', rating: 5, comment: 'Fantastisches Tech-Hub mit unglaublichen Networking-Möglichkeiten!' },
-  { spaceId: 'space-1', userId: 'u5', rating: 4, comment: 'Tolle Einrichtungen und sehr professionelle Atmosphäre.' },
-  { spaceId: 'space-2', userId: 'u3', rating: 5, comment: 'Rocket Internet Campus ist fantastisch für Lernen und Wachstum.' },
-  { spaceId: 'space-3', userId: 'u3', rating: 5, comment: 'Siemens Digital Factory hat alle Erwartungen übertroffen!' },
-  { spaceId: 'space-4', userId: 'u5', rating: 4, comment: 'Berlin Vibe ist perfekt für Fintech-Startup-Kultur.' },
-  { spaceId: 'space-5', userId: 'u3', rating: 4, comment: 'Delivery Hero Trainingsmöglichkeiten sind unbezahlbar.' },
-  { spaceId: 'space-6', userId: 'u5', rating: 5, comment: 'AutoScout24 Lab-Zugang ist ein Game Changer für meine Projekte.' },
-  { spaceId: 'space-7', userId: 'u3', rating: 5, comment: 'Hackescher Markt Loft hat so inspirierende kreative Energie!' },
-  { spaceId: 'space-8', userId: 'u5', rating: 4, comment: 'Perfekt für fokussiertes Arbeiten mit tollen Wellness-Angeboten.' },
-  { spaceId: 'space-9', userId: 'u3', rating: 5, comment: 'Rheinblick macht Remote Work wie Urlaub!' },
-  { spaceId: 'space-10', userId: 'u5', rating: 4, comment: 'Executive Suites sind perfekt für Kundentermine.' },
-  { spaceId: 'space-11', userId: 'u3', rating: 5, comment: 'VC-Verbindungen haben geholfen, mein Startup zu skalieren!' },
-  { spaceId: 'space-12', userId: 'u5', rating: 4, comment: 'Liebe den umweltfreundlichen Ansatz und Fahrradstellplätze.' },
-  { spaceId: 'space-13', userId: 'u3', rating: 4, comment: 'Tolles Preis-Leistungs-Verhältnis mit fantastischem Maker Space!' },
-  { spaceId: 'space-14', userId: 'u5', rating: 3, comment: 'Perfekt für Studenten und junge Unternehmer.' },
-  { spaceId: 'space-15', userId: 'u3', rating: 4, comment: 'Community Workshop hat tollen kollaborativen Geist.' }
+  { spaceId: 'space-1', userId: 'u3', rating: 5, comment: 'Fantastic tech hub with incredible networking opportunities!' },
+  { spaceId: 'space-1', userId: 'u5', rating: 4, comment: 'Great facilities and very professional atmosphere.' },
+  { spaceId: 'space-2', userId: 'u3', rating: 5, comment: 'Rocket Internet Campus is fantastic for learning and growth.' },
+  { spaceId: 'space-3', userId: 'u3', rating: 5, comment: 'Siemens Digital Factory exceeded all expectations!' },
+  { spaceId: 'space-4', userId: 'u5', rating: 4, comment: 'Berlin vibe is perfect for fintech startup culture.' },
+  { spaceId: 'space-5', userId: 'u3', rating: 4, comment: 'Delivery Hero training opportunities are invaluable.' },
+  { spaceId: 'space-6', userId: 'u5', rating: 5, comment: 'AutoScout24 lab access is a game changer for my projects.' },
+  { spaceId: 'space-7', userId: 'u3', rating: 5, comment: 'Hackescher Markt loft has such inspiring creative energy!' },
+  { spaceId: 'space-8', userId: 'u5', rating: 4, comment: 'Perfect for focused work with great wellness amenities.' },
+  { spaceId: 'space-9', userId: 'u3', rating: 5, comment: 'Rhine view makes remote work feel like vacation!' },
+  { spaceId: 'space-10', userId: 'u5', rating: 4, comment: 'Executive suites are perfect for client meetings.' },
+  { spaceId: 'space-11', userId: 'u3', rating: 5, comment: 'VC connections helped scale my startup!' },
+  { spaceId: 'space-12', userId: 'u5', rating: 4, comment: 'Love the eco-friendly approach and bike parking.' },
+  { spaceId: 'space-13', userId: 'u3', rating: 4, comment: 'Great value for money with fantastic maker space!' },
+  { spaceId: 'space-14', userId: 'u5', rating: 3, comment: 'Perfect for students and young entrepreneurs.' },
+  { spaceId: 'space-15', userId: 'u3', rating: 4, comment: 'Community workshop has great collaborative spirit.' }
 ];
 
 // Dummy Matches for Carol (u3)
@@ -905,7 +905,7 @@ export const popularSearches = [
   'Corporate Hubs in Berlin',
   'Day Pass in Frankfurt',
   'Monthly Desks in Hamburg',
-  'Private Offices in Köln'
+  'Private Offices in Cologne'
 ];
 
 // Trusted company logos for homepage
