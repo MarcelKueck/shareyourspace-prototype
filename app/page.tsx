@@ -1,49 +1,13 @@
 'use client';
 
-import { useState } from 'react';
 import { Calendar, Building } from 'lucide-react';
-import { enhancedSpaces, searchSpaces } from './lib/enhanced-data';
-import { popularSearches } from './lib/dummy-data';
-import { SpaceType } from './lib/types';
+import { useRouter } from 'next/navigation';
+import { enhancedSpaces } from './lib/enhanced-data';
 import DiscoverySection from './components/pages/DiscoverySection';
 import TargetGroupCarousel from './components/pages/TargetGroupCarousel';
-import SmartSearchBar, { SearchFilters } from './components/ui/SmartSearchBar';
-import SmartSpaceCard from './components/ui/SmartSpaceCard';
 
 export default function HomePage() {
-  const [searchResults, setSearchResults] = useState(enhancedSpaces);
-  const [isSearchActive, setIsSearchActive] = useState(false);
-  const [bookingMode, setBookingMode] = useState<'flexible' | 'contract' | null>(null);
-
-  const handleSearch = (filters: SearchFilters) => {
-    const results = searchSpaces(
-      enhancedSpaces,
-      filters.location || undefined,
-      filters.checkIn ? new Date(filters.checkIn) : undefined,
-      filters.checkOut ? new Date(filters.checkOut) : undefined,
-      filters.guests || undefined,
-      filters.maxPrice || undefined,
-      filters.spaceType || undefined
-    );
-    setSearchResults(results);
-    setIsSearchActive(true);
-  };
-
-  const handleContractSearch = (spaceType: SpaceType) => {
-    // Filter spaces that have contracts available for the specified space type
-    const contractSpaces = enhancedSpaces.filter(space => 
-      space.contracts?.available && 
-      space.contracts.plans.some(plan => plan.spaceType === spaceType)
-    );
-    setSearchResults(contractSpaces);
-    setIsSearchActive(true);
-  };
-
-  const clearSearch = () => {
-    setSearchResults(enhancedSpaces);
-    setIsSearchActive(false);
-    // Don't reset booking mode when clearing search, let user stay in their chosen flow
-  };
+  const router = useRouter();
 
   // Filter spaces by different categories using enhanced spaces
   const featuredSpaces = enhancedSpaces.slice(0, 8);
@@ -59,7 +23,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className={`relative ${bookingMode ? 'min-h-screen' : 'h-screen min-h-[800px]'} flex items-center justify-center overflow-hidden`}>
+      <section className="relative h-screen min-h-[800px] flex items-center justify-center overflow-hidden">
         {/* Professional Background Image - Modern Office */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -78,7 +42,7 @@ export default function HomePage() {
         </div>
         
         {/* Hero Content */}
-        <div className={`relative z-10 text-center text-white max-w-7xl mx-auto px-4 ${bookingMode ? 'py-20' : ''}`}>
+        <div className="relative z-10 text-center text-white max-w-7xl mx-auto px-4">
           <div className="space-y-8 animate-fade-in-up">
             <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight">
               <span className="block">Find your perfect</span>
@@ -91,203 +55,76 @@ export default function HomePage() {
             </p>
           </div>
           
-          {/* Dual Booking Options - Only show when no mode is selected */}
-          {!bookingMode && (
-            <div className="mt-16 max-w-5xl mx-auto">
-              <div className="grid md:grid-cols-2 gap-6 animate-fade-in-up">
-                {/* Short-term Booking Card */}
-                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 hover:bg-white/15 hover:border-white/30 transition-all duration-300 group cursor-pointer transform hover:scale-105">
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-500/30 transition-colors">
-                      <Calendar className="w-8 h-8 text-blue-300" />
-                    </div>
-                    <h3 className="text-2xl font-bold mb-4">Book a Space</h3>
-                    <p className="text-gray-300 mb-6 leading-relaxed">
-                      Flexible hourly, daily, or weekly workspace bookings. Perfect for meetings, events, or temporary needs.
-                    </p>
-                    <button 
-                      onClick={() => setBookingMode('flexible')}
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 px-6 rounded-xl font-semibold transition-colors group-hover:bg-blue-500"
-                    >
-                      Start Booking
-                    </button>
+          {/* Dual Booking Options */}
+          <div className="mt-16 max-w-5xl mx-auto">
+            <div className="grid md:grid-cols-2 gap-6 animate-fade-in-up">
+              {/* Short-term Booking Card */}
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 hover:bg-white/15 hover:border-white/30 transition-all duration-300 group cursor-pointer transform hover:scale-105">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-blue-500/30 transition-colors">
+                    <Calendar className="w-8 h-8 text-blue-300" />
                   </div>
+                  <h3 className="text-2xl font-bold mb-4">Book a Space</h3>
+                  <p className="text-gray-300 mb-6 leading-relaxed">
+                    Flexible hourly, daily, or weekly workspace bookings. Perfect for meetings, events, or temporary needs.
+                  </p>
+                  <button 
+                    onClick={() => router.push('/booking/flexible')}
+                    className="w-full bg-blue-600 hover:bg-blue-700 text-white py-4 px-6 rounded-xl font-semibold transition-colors group-hover:bg-blue-500"
+                  >
+                    Start Booking
+                  </button>
                 </div>
+              </div>
 
-                {/* Long-term Contract Card */}
-                <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 hover:bg-white/15 hover:border-white/30 transition-all duration-300 group cursor-pointer transform hover:scale-105">
-                  <div className="text-center">
-                    <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-purple-500/30 transition-colors">
-                      <Building className="w-8 h-8 text-purple-300" />
-                    </div>
-                    <h3 className="text-2xl font-bold mb-4">Get Workspace Contract</h3>
-                    <p className="text-gray-300 mb-6 leading-relaxed">
-                      Monthly workspace contracts with dedicated desks, offices, and team spaces. Better rates for committed teams.
-                    </p>
-                    <button 
-                      onClick={() => setBookingMode('contract')}
-                      className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-xl font-semibold transition-colors group-hover:bg-purple-500"
-                    >
-                      Explore Contracts
-                    </button>
+              {/* Long-term Contract Card */}
+              <div className="bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl p-8 hover:bg-white/15 hover:border-white/30 transition-all duration-300 group cursor-pointer transform hover:scale-105">
+                <div className="text-center">
+                  <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-6 group-hover:bg-purple-500/30 transition-colors">
+                    <Building className="w-8 h-8 text-purple-300" />
                   </div>
+                  <h3 className="text-2xl font-bold mb-4">Get Workspace Contract</h3>
+                  <p className="text-gray-300 mb-6 leading-relaxed">
+                    Monthly workspace contracts with dedicated desks, offices, and team spaces. Better rates for committed teams.
+                  </p>
+                  <button 
+                    onClick={() => router.push('/booking/contracts')}
+                    className="w-full bg-purple-600 hover:bg-purple-700 text-white py-4 px-6 rounded-xl font-semibold transition-colors group-hover:bg-purple-500"
+                  >
+                    Explore Contracts
+                  </button>
                 </div>
               </div>
             </div>
-          )}
-
-          {/* Search Interface Based on Selected Mode */}
-          {bookingMode && (
-            <div className="mt-16 max-w-7xl mx-auto animate-fade-in-up">
-              {/* Back Button */}
-              <div className="mb-8">
-                <button
-                  onClick={() => setBookingMode(null)}
-                  className="inline-flex items-center px-4 py-2 text-sm text-gray-300 hover:text-white transition-colors"
-                >
-                  <span className="mr-2">←</span>
-                  Back to options
-                </button>
-              </div>
-
-              {bookingMode === 'flexible' ? (
-                <>
-                  <h4 className="text-xl font-semibold mb-6">Find your flexible workspace</h4>
-                  <SmartSearchBar onSearch={handleSearch} />
-                  
-                  {/* Popular Searches */}
-                  <div className="mt-8 mb-12">
-                    <p className="text-gray-300 text-sm mb-4 font-medium">Popular searches:</p>
-                    <div className="flex flex-wrap gap-3 justify-center">
-                      {popularSearches.map((search, index) => (
-                        <button
-                          key={index}
-                          className="px-4 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white text-sm font-medium hover:bg-white/20 hover:border-white/30 transition-all duration-300"
-                        >
-                          {search}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              ) : (
-                <div className="text-center mb-12">
-                  <h4 className="text-xl font-semibold mb-6">Browse workspace contracts</h4>
-                  <div className="flex flex-wrap gap-4 justify-center">
-                    <button
-                      onClick={() => handleContractSearch('hot-desk')}
-                      className="px-6 py-3 bg-purple-600/20 backdrop-blur-sm border border-purple-300/30 rounded-full text-purple-200 font-medium hover:bg-purple-600/30 transition-all duration-300"
-                    >
-                      Hot Desk Plans
-                    </button>
-                    <button
-                      onClick={() => handleContractSearch('desk')}
-                      className="px-6 py-3 bg-purple-600/20 backdrop-blur-sm border border-purple-300/30 rounded-full text-purple-200 font-medium hover:bg-purple-600/30 transition-all duration-300"
-                    >
-                      Dedicated Desks
-                    </button>
-                    <button
-                      onClick={() => handleContractSearch('private-office')}
-                      className="px-6 py-3 bg-purple-600/20 backdrop-blur-sm border border-purple-300/30 rounded-full text-purple-200 font-medium hover:bg-purple-600/30 transition-all duration-300"
-                    >
-                      Private Offices
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
+          </div>
         </div>
       </section>
 
-      {/* Dynamic Target Group Solutions Section - Only show when no search is active and no booking mode is selected */}
-      {!isSearchActive && !bookingMode && (
-        <section className="h-screen min-h-[800px] flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
-          {/* Background Pattern */}
-          <div className="absolute inset-0 opacity-10">
-            <div className="absolute top-0 left-0 w-full h-full" style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
-            }}></div>
-          </div>
-          
-          <div className="w-full h-full overflow-hidden">
-            <TargetGroupCarousel />
-          </div>
-        </section>
-      )}
+      {/* Dynamic Target Group Solutions Section */}
+      <section className="h-screen min-h-[800px] flex items-center justify-center bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 relative overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-0 w-full h-full" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
+          }}></div>
+        </div>
+        
+        <div className="w-full h-full overflow-hidden">
+          <TargetGroupCarousel />
+        </div>
+      </section>
 
-      {/* Discovery Sections or Search Results */}
+      {/* Discovery Sections */}
       <div className="bg-white">
-        {isSearchActive ? (
-          /* Search Results */
-          <section className="py-12">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <div className="flex justify-between items-center mb-8">
-                <div>
-                  <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                    {searchResults.length} {bookingMode === 'contract' ? 'workspace' : 'space'}{searchResults.length !== 1 ? 's' : ''} found
-                  </h2>
-                  <p className="text-gray-600">
-                    {bookingMode === 'contract' 
-                      ? 'Discover workspace contracts for long-term productivity' 
-                      : 'Discover the perfect space for your flexible booking needs'}
-                  </p>
-                </div>
-                <button
-                  onClick={clearSearch}
-                  className="px-6 py-3 text-blue-600 hover:text-blue-800 font-medium border border-blue-200 hover:border-blue-300 rounded-xl transition-colors"
-                >
-                  Browse all spaces
-                </button>
-              </div>
-              
-              {searchResults.length > 0 ? (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {searchResults.map((space) => (
-                    <SmartSpaceCard 
-                      key={space.id} 
-                      space={space} 
-                      showContracts={bookingMode === 'contract'}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="text-center py-16">
-                  <div className="max-w-md mx-auto">
-                    <div className="mb-6">
-                      <div className="w-24 h-24 mx-auto bg-gray-100 rounded-full flex items-center justify-center">
-                        <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                      </div>
-                    </div>
-                    <h3 className="text-xl font-semibold text-gray-900 mb-2">No spaces found</h3>
-                    <p className="text-gray-600 mb-6">Try adjusting your search criteria or browse all available workspaces.</p>
-                    <button
-                      onClick={clearSearch}
-                      className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-xl font-medium transition-colors"
-                    >
-                      Browse all spaces
-                    </button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </section>
-        ) : (
-          /* Discovery Sections */
-          <>
-            <DiscoverySection title="Featured Workspaces" spaces={featuredSpaces} />
-            <DiscoverySection title="Great Hourly Rates" spaces={hourlySpaces} />
-            <DiscoverySection title="Perfect for Day Passes" spaces={dailySpaces} />
-            <DiscoverySection title="Monthly Desk Options" spaces={monthlySpaces} />
-            <DiscoverySection title="Private Office Suites" spaces={privateOffices} />
-            <DiscoverySection title="Meeting Room Solutions" spaces={meetingRooms} />
-            <DiscoverySection title="Corporate Innovation Hubs" spaces={corporateSpaces} />
-            <DiscoverySection title="Premium Locations" spaces={premiumSpaces} />
-            <DiscoverySection title="Great Value Workspaces" spaces={budgetSpaces} />
-          </>
-        )}
+        <DiscoverySection title="Featured Workspaces" spaces={featuredSpaces} />
+        <DiscoverySection title="Great Hourly Rates" spaces={hourlySpaces} />
+        <DiscoverySection title="Perfect for Day Passes" spaces={dailySpaces} />
+        <DiscoverySection title="Monthly Desk Options" spaces={monthlySpaces} />
+        <DiscoverySection title="Private Office Suites" spaces={privateOffices} />
+        <DiscoverySection title="Meeting Room Solutions" spaces={meetingRooms} />
+        <DiscoverySection title="Corporate Innovation Hubs" spaces={corporateSpaces} />
+        <DiscoverySection title="Premium Locations" spaces={premiumSpaces} />
+        <DiscoverySection title="Great Value Workspaces" spaces={budgetSpaces} />
       </div>
     </div>
   );

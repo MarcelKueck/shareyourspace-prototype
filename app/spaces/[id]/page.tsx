@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { notFound, useSearchParams } from 'next/navigation';
+import { notFound, useSearchParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Star, MapPin, Wifi, ChevronLeft, ChevronRight, ArrowLeft } from 'lucide-react';
@@ -23,9 +23,10 @@ export default function SpacePage({ params }: PageProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [spaceId, setSpaceId] = useState<string | null>(null);
   const searchParams = useSearchParams();
+  const router = useRouter();
   const mode = searchParams.get('mode') as 'flexible' | 'contract' || 'flexible';
   
-  const { spaceType: storedSpaceType } = useSearchStore();
+  const { spaceType: storedSpaceType, setSearchFilters } = useSearchStore();
   const urlType = searchParams.get('type') as SpaceType | null;
   const initialType = urlType || storedSpaceType;
   
@@ -38,6 +39,24 @@ export default function SpacePage({ params }: PageProps) {
     };
     getParams();
   }, [params]);
+
+  // Update search store with URL parameters
+  useEffect(() => {
+    const location = searchParams.get('location');
+    const checkIn = searchParams.get('checkIn');
+    const checkOut = searchParams.get('checkOut');
+    const guests = searchParams.get('guests');
+    const spaceType = searchParams.get('type') as SpaceType;
+    
+    if (location || checkIn || checkOut || guests || spaceType) {
+      setSearchFilters({
+        checkIn: checkIn ? new Date(checkIn) : null,
+        checkOut: checkOut ? new Date(checkOut) : null,
+        guests: guests ? parseInt(guests) : 1,
+        spaceType: spaceType || null
+      });
+    }
+  }, [searchParams, setSearchFilters]);
 
   const space = enhancedSpaces.find((s) => s.id === spaceId);
 
@@ -85,13 +104,32 @@ export default function SpacePage({ params }: PageProps) {
     setSelectedUnit(unit);
   };
 
+  // Build back link based on mode and search parameters
+  const buildBackLink = () => {
+    const params = new URLSearchParams();
+    const location = searchParams.get('location');
+    const checkIn = searchParams.get('checkIn');
+    const checkOut = searchParams.get('checkOut');
+    const guests = searchParams.get('guests');
+    const spaceType = searchParams.get('type');
+    
+    if (location) params.set('location', location);
+    if (checkIn) params.set('checkIn', checkIn);
+    if (checkOut) params.set('checkOut', checkOut);
+    if (guests) params.set('guests', guests);
+    if (spaceType) params.set('type', spaceType);
+    
+    const basePath = mode === 'contract' ? '/booking/contracts' : '/booking/flexible';
+    return params.toString() ? `${basePath}?${params.toString()}` : basePath;
+  };
+
   return (
     <div className="bg-white text-gray-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Back to search link */}
-        <Link href="/" className="text-sm text-blue-600 hover:underline mb-4 inline-block">
+        <Link href={buildBackLink()} className="text-sm text-blue-600 hover:underline mb-4 inline-block">
           <ArrowLeft className="w-4 h-4 inline-block mr-1" />
-          Back to search
+          Back to {mode === 'contract' ? 'contracts' : 'flexible bookings'}
         </Link>
 
         {/* Title and details */}
@@ -113,7 +151,17 @@ export default function SpacePage({ params }: PageProps) {
             }`}>
               {space.type}
             </span>
+            {mode === 'contract' && space.contracts?.available && (
+              <span className="px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                Contract Mode
+              </span>
+            )}
           </div>
+          {mode === 'contract' && (
+            <p className="text-sm text-gray-600 mt-2">
+              Browse long-term workspace contracts with dedicated space and premium benefits
+            </p>
+          )}
         </div>
 
         {/* Image Gallery */}
@@ -189,6 +237,30 @@ export default function SpacePage({ params }: PageProps) {
               ) : (
                 <WorkspaceContractWidget space={space} selectedUnit={selectedUnit} />
               )}
+              
+              {/* Mode Switch */}
+              <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+                <div className="text-sm text-gray-600 mb-2">Looking for something else?</div>
+                <div className="flex gap-2">
+                  {mode === 'contract' ? (
+                    <button
+                      onClick={() => router.push(`/spaces/${space.id}?mode=flexible${initialType ? `&type=${initialType}` : ''}`)}
+                      className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                    >
+                      Switch to flexible booking →
+                    </button>
+                  ) : (
+                    space.contracts?.available && (
+                      <button
+                        onClick={() => router.push(`/spaces/${space.id}?mode=contract${initialType ? `&type=${initialType}` : ''}`)}
+                        className="text-sm text-purple-600 hover:text-purple-800 font-medium"
+                      >
+                        Switch to workspace contracts →
+                      </button>
+                    )
+                  )}
+                </div>
+              </div>
             </div>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { Heart, CheckCircle, Users, Shield, Award } from 'lucide-react';
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import { Space } from '../../lib/types';
 import { useAuthStore } from '../../store/authStore';
 
@@ -15,6 +16,7 @@ interface SmartSpaceCardProps {
 export default function SmartSpaceCard({ space, showContracts = false }: SmartSpaceCardProps) {
   const [isWishlisted, setIsWishlisted] = useState(false);
   const { currentUser, corporateAllowance } = useAuthStore();
+  const searchParams = useSearchParams();
   
   // Enhanced space has basePrice and hourlyRate instead of pricePerDay/pricePerMonth
   const dailyPrice = space.basePrice;
@@ -24,8 +26,30 @@ export default function SmartSpaceCard({ space, showContracts = false }: SmartSp
   // Check if current user's company is also a host and gets cross-benefits
   const userGetsHostDiscount = currentUser?.companyId && corporateAllowance?.company?.isHost && space.corporateHostBenefits?.crossBenefitsAvailable;
 
+  // Build URL with current search context
+  const buildSpaceUrl = () => {
+    const mode = showContracts ? 'contract' : 'flexible';
+    const params = new URLSearchParams();
+    params.set('mode', mode);
+    
+    // Preserve search parameters from the current page
+    const currentType = searchParams.get('type');
+    const currentLocation = searchParams.get('location');
+    const currentCheckIn = searchParams.get('checkIn');
+    const currentCheckOut = searchParams.get('checkOut');
+    const currentGuests = searchParams.get('guests');
+    
+    if (currentType) params.set('type', currentType);
+    if (currentLocation) params.set('location', currentLocation);
+    if (currentCheckIn) params.set('checkIn', currentCheckIn);
+    if (currentCheckOut) params.set('checkOut', currentCheckOut);
+    if (currentGuests) params.set('guests', currentGuests);
+    
+    return `/spaces/${space.id}?${params.toString()}`;
+  };
+
   return (
-    <Link href={`/spaces/${space.id}`} className="group cursor-pointer block">
+    <Link href={buildSpaceUrl()} className="group cursor-pointer block">
       {/* Image Container - Ultra Compact with 4:3 ratio */}
       <div className="relative aspect-[4/3] overflow-hidden rounded-lg mb-1.5 sm:mb-2">
         <Image
