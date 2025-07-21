@@ -1,4 +1,21 @@
-@import "tailwindcss";
+/* Custom scrollbar for scrollable lists, hide arrows */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #e5e7eb #fff;
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  background: #fff;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #e5e7eb;
+  border-radius: 8px;
+}
+.custom-scrollbar::-webkit-scrollbar-button {
+  display: none;
+  height: 0;
+  width: 0;
+}@import "tailwindcss";
 
 :root {
   --background: #ffffff;

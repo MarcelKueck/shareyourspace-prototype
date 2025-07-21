@@ -6,7 +6,7 @@ import { enhancedSpaces, searchSpaces } from '../../lib/enhanced-data';
 import SmartSearchBar, { SearchFilters } from '../../components/ui/SmartSearchBar';
 import SmartSpaceCard from '../../components/ui/SmartSpaceCard';
 import FiltersModal from '../../components/ui/FiltersModal';
-import { ChevronLeft, MapPin, SlidersHorizontal } from 'lucide-react';
+import { ChevronLeft, MapPin } from 'lucide-react';
 
 export default function FlexibleBookingPage() {
   const [searchResults, setSearchResults] = useState(enhancedSpaces);
@@ -151,26 +151,43 @@ export default function FlexibleBookingPage() {
                 </p>
               </div>
               
-              {/* Sort and Filter Controls */}
+              {/* Sort Controls Only (Filters removed) */}
               <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setShowFiltersModal(true)}
-                  className="flex items-center px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
-                >
-                  <SlidersHorizontal className="w-4 h-4 mr-2" />
-                  Filters
-                </button>
-                
-                <select
-                  value={sortBy}
-                  onChange={(e) => setSortBy(e.target.value as 'price' | 'rating' | 'distance')}
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                >
-                  <option value="price">Price: Low to High</option>
-                  <option value="rating">Rating: High to Low</option>
-                  <option value="distance">Distance</option>
-                </select>
-
+                <div className="relative">
+                  <button
+                    className="flex items-center px-4 py-2 border border-gray-300 rounded-full text-sm font-semibold text-gray-700 bg-white shadow hover:shadow-md transition-all focus:outline-none focus:ring-2 focus:ring-gray-300"
+                    onClick={() => {
+                      const dropdown = document.getElementById('sort-dropdown');
+                      if (dropdown) dropdown.classList.toggle('hidden');
+                    }}
+                  >
+                    <span className="mr-2">Sort by:</span>
+                    {sortBy === 'price' && <span className="font-bold">Price: Low to High</span>}
+                    {sortBy === 'rating' && <span className="font-bold">Rating: High to Low</span>}
+                    {sortBy === 'distance' && <span className="font-bold">Distance</span>}
+                    <svg className="ml-2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" /></svg>
+                  </button>
+                  <div id="sort-dropdown" className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-lg z-30 hidden">
+                    <button
+                      onClick={() => { setSortBy('price'); document.getElementById('sort-dropdown')?.classList.add('hidden'); }}
+                      className={`block w-full text-left px-5 py-3 text-sm rounded-t-xl ${sortBy === 'price' ? 'bg-gray-100 text-gray-900 font-bold' : 'hover:bg-gray-50 text-gray-700'}`}
+                    >
+                      Price: Low to High
+                    </button>
+                    <button
+                      onClick={() => { setSortBy('rating'); document.getElementById('sort-dropdown')?.classList.add('hidden'); }}
+                      className={`block w-full text-left px-5 py-3 text-sm ${sortBy === 'rating' ? 'bg-gray-100 text-gray-900 font-bold' : 'hover:bg-gray-50 text-gray-700'}`}
+                    >
+                      Rating: High to Low
+                    </button>
+                    <button
+                      onClick={() => { setSortBy('distance'); document.getElementById('sort-dropdown')?.classList.add('hidden'); }}
+                      className={`block w-full text-left px-5 py-3 text-sm rounded-b-xl ${sortBy === 'distance' ? 'bg-gray-100 text-gray-900 font-bold' : 'hover:bg-gray-50 text-gray-700'}`}
+                    >
+                      Distance
+                    </button>
+                  </div>
+                </div>
                 <button
                   onClick={clearSearch}
                   className="px-4 py-2 text-blue-600 hover:text-blue-800 font-medium transition-colors"
